@@ -2,11 +2,11 @@
 
 ----
 
-OpenEmbedded/Yocto Layer for System Electronics SoM 'Astrial'
+Yocto Layer for System Electronics SoM 'Astrial'
 ================================================================
 
-This layer **meta-sysele-nxp-5.15.71** provides the distro configuration used 
-to build the demo images provided for System Electronics 'Astrial' system on module.
+This Yocto Project / OpenEmbedded layer **meta-sysele-nxp-5.15.71** provides the distro 
+configuration used to build the demo images provided for **System Electronics 'Astrial'** system on module.
 
 Dependencies
 ============
