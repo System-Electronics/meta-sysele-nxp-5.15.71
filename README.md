@@ -1,41 +1,44 @@
-This README file contains information on the contents of the meta-sysele-nxp-5.15.71 layer.
+![System Electronics](https://www.systemelectronics.com/wp-content/uploads/2023/01/cropped-System_Electronics_Coesia_Logo_Vector_CMYK-003.png)
 
-Please see the corresponding sections below for details.
+----
+
+OpenEmbedded/Yocto Layer for System Electronics SoM 'Astrial'
+================================================================
+
+This layer **meta-sysele-nxp-5.15.71** provides the distro configuration used 
+to build the demo images provided for System Electronics 'Astrial' system on module.
 
 Dependencies
 ============
 
-  URI: <first dependency>
-  branch: <branch name>
+The setup is strictly alilgned to the version NXP imx-5.15.71-2.2.0
 
-  URI: <second dependency>
-  branch: <branch name>
+Building
+========
 
-  .
-  .
-  .
+See the [ASTRIAL-YOCTO-INSTALL.md](https://github.com/System-Electronics/meta-sysele-nxp-5.15.71/blob/main/ASTRIAL-YOCTO-INSTALL.md) in **meta-sysele-nxp-5.15.71** layer.
 
 Patches
 =======
 
-Please submit any patches against the meta-sysele-nxp-5.15.71 layer to the xxxx mailing list (xxxx@zzzz.org)
-and cc: the maintainer:
+This layer is maintained by System Electronics.
 
-Maintainer: XXX YYYYYY <xxx.yyyyyy@zzzzz.com>
+When creating a patch of the last commit, use
 
-Table of Contents
-=================
+    git format-patch -s --subject-prefix='meta-sysele][<branch>][PATCH' -1
 
-  I. Adding the meta-sysele-nxp-5.15.71 layer to your build
- II. Misc
+To send patches, use
+
+    git send-email --to github@systemelectronics.com <generated patch>
 
 
-I. Adding the meta-sysele-nxp-5.15.71 layer to your build
-=================================================
+License
+=======
 
-Run 'bitbake-layers add-layer meta-sysele-nxp-5.15.71'
+All metadata is MIT licensed unless otherwise stated. Source code and
+binaries included in tree for individual recipes is under the LICENSE
+stated in each recipe (.bb file) unless otherwise stated.
 
-II. Misc
-========
+---
 
---- replace with specific information about the meta-sysele-nxp-5.15.71 layer ---
+This document is Copyright (C)2024 KOAN sas - [https://koansoftware.com](https://koansoftware.com)
