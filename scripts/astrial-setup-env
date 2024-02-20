@@ -1,0 +1,25 @@
+#!/bin/bash -e
+
+MACHINE=${MACHINE:-astrial-imx8mp}
+DISTRO=${DISTRO:-fsl-imx-xwayland}
+EULA=1
+T="../sources-extra/meta-sysele-nxp-5.15.71/templates"
+
+BD=$(cat <<< $@ | awk '$0=$NF')
+
+if [[ -d ${BD} ]];then
+
+echo "Back to the build environment ${BD}"
+. setup-environment ${BD}
+
+else
+
+. imx-setup-release.sh $@
+
+for _d in ${T}/*;do
+	_file=$(basename ${_d})
+	for _f in ${_d}/*;do
+		cat ${_f} >> conf/${_file}
+	done;
+done
+fi

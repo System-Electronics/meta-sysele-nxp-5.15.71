@@ -1,0 +1,9 @@
+
+# Hailo layers
+BBLAYERS += "${BSPDIR}/sources-extra/meta-hailo/meta-hailo-accelerator"
+BBLAYERS += "${BSPDIR}/sources-extra/meta-hailo/meta-hailo-libhailort"
+BBLAYERS += "${BSPDIR}/sources-extra/meta-hailo/meta-hailo-tappas"
+BBLAYERS += "${BSPDIR}/sources-extra/meta-hailo/meta-hailo-vpu"
+
+# System Electronics layer
+BBLAYERS += "${BSPDIR}/sources-extra/meta-sysele-nxp-5.15.71"
