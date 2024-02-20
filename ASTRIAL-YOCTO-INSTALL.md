@@ -133,7 +133,7 @@ TARGET_FPU           = ""
 The build involves a lot of packages and in case you face to issues at the end on Qt or Rust, 
 please reduce the cores enabled for the build.
 
-In bblayers.conf set the following variable
+In **local.conf** set the following variable
 
 ```python
 BB_NUMBER_THREADS="2"
