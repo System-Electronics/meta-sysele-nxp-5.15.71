@@ -184,6 +184,18 @@ unzstd -d imx-image-full-astrial-imx8mp-20240219080646.rootfs.wic.zst
 sudo ./uuu -b emmc_all imx-boot-astrial-sd.bin-flash_evk imx-image-full-astrial-imx8mp-20240219080646.rootfs.wic
 ```
 
+
+## eMMC erase
+
+In case you need to restore the Astrial SoM to its factory state, these are the steps to erase the eMMC flash memory on Astrial SoM from the U-Boot bootloader.
+
+Boot the board, and press a key in the serial terminal to enter in the u-boot shell, then enter the following command:
+
+```bash
+mmc erase 0 0x1000
+```
+
+
 ---------------------
 
 # Serial debug port
