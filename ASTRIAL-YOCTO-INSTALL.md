@@ -150,11 +150,11 @@ Program eMMC with the NXP **uuu** (Universal Update Utility) valid for Linux, Wi
 
 ## Get the program 'uuu'
 
-Download the latest stable version, or ver. 1.5.165
-https://github.com/nxp-imx/mfgtools/releases/tag/uuu_1.5.165
+Download the latest stable version, or ver. 1.5.125
+https://github.com/nxp-imx/mfgtools/releases/tag/uuu_1.5.125
 
 ```
-wget https://github.com/nxp-imx/mfgtools/releases/download/uuu_1.5.165/uuu
+wget https://github.com/nxp-imx/mfgtools/releases/download/uuu_1.5.125/uuu
 ```
 
 And change execution permissions (Linux only)
