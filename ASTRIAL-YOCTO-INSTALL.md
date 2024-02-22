@@ -12,10 +12,10 @@ This guide is targeted and tested on a x86-64bit PC with **Ubuntu 22.04 64bit**.
 
 * **IMPORTANT** : is mandatory to have 200GB free space on storage !
 
-Minimum suggested requirements:
+The suggested requirements are:
 
-* at least 4 cores
-* at least 16BG RAM
+* at least 8 cores
+* at least 32BG RAM
 * at least 250GB storage (possibly a SSD)
 
 The list of packages needed on the development host is extensive, and varies depending on the features to be built in the image for the Yocto target. The packages that must necessarily be installed on the system are listed below.
@@ -31,7 +31,8 @@ Install the required packages
 sudo apt update
 sudo apt upgrade
 sudo apt install gawk wget git diffstat unzip texinfo gcc build-essential chrpath socat cpio python3 python3-pip python3-pexpect xz-utils debianutils iputils-ping python3-git python3-jinja2 libegl1-mesa libsdl1.2-dev python3-subunit mesa-common-dev zstd liblz4-tool file locales libacl1
-sudo apt  install curl python-is-python3
+sudo apt install curl python-is-python3
+sudo apt-get install bmap-tools
 sudo locale-gen en_US.UTF-8
 ```
 
@@ -99,7 +100,7 @@ source astrial-setup-env -b build
 ```
 
 
-* When you need to Initialize the build environment later
+* When you need to initialize the build environment later
 
 ```bash
 source setup-environment build
@@ -128,32 +129,59 @@ TARGET_FPU           = ""
 ```
 
 
-## Build issues
-
-The build involves a lot of packages and in case you face to issues at the end on Qt or Rust, 
-please reduce the cores enabled for the build.
-
-In **local.conf** set the following variable
-
-```python
-BB_NUMBER_THREADS="2"
-```
-
-The build may fail many times. In that case restart bitbake again and again until it works.
-
-
 ---------------------------
 
 # Board programming
 
+## MicroSD programming
+
+NOTE: replace `/dev/sdX` with a proper device name and replace the timestamp '20240219080646' with the proper one.
+
 ```bash
-sudo apt-get install bmap-tools
+sudo umount /dev/sdX*
+
+sudo bmaptool copy imx-image-full-astrial-imx8mp-20240219080646.rootfs.wic.zst /dev/sdX
 ```
 
-```bash
-sudo umount /media/tux/*
+## eMMC programming
 
-sudo bmaptool copy imx-image-full-imx8mp-lpddr4-evk.wic.zst /dev/sdX
+
+Program eMMC with the NXP **uuu** (Universal Update Utility) valid for Linux, Windows, MacOS(not test yet).
+
+## Get the program 'uuu'
+
+Download the latest stable version, or ver. 1.5.165
+https://github.com/nxp-imx/mfgtools/releases/tag/uuu_1.5.165
+
+```
+wget https://github.com/nxp-imx/mfgtools/releases/download/uuu_1.5.165/uuu
+```
+
+And change execution permissions (Linux only)
+
+```
+chmod +x ./uuu
+```
+
+In case you want to use `uuu` for Windows, please use the file `uuu.exe`
+
+## Program the eMMC
+
+The artifacts are located in the directory `tmp/deploy/images/astrial-imx8mp`.
+
+Uncompress the file **wic.zst**
+
+NOTE: replace the timestamp '20240219080646' with the proper one.
+
+```bash
+unzstd -d imx-image-full-astrial-imx8mp-20240219080646.rootfs.wic.zst
+```
+
+1. Connect a microUSB cable to USB-OTG (J11) on the **Raspberry CM4-IO board** to your PC.
+1. Run the following command to program the eMMC
+
+```bash
+sudo ./uuu -b emmc_all imx-boot-astrial-sd.bin-flash_evk imx-image-full-astrial-imx8mp-20240219080646.rootfs.wic
 ```
 
 ---------------------
@@ -166,4 +194,41 @@ You can use a FTDI 3v3 UART to USB adapter to connectt the board to a PC.
 
 ```bash
 picocom -b 115200 /dev/ttyUSB0
+```
+
+-------------------
+
+
+# Trobleshooting
+
+* Native linux machine 
+
+The suggested condition to avoid build issues is to run Yocto bitbake into a Linux native machine.
+
+* Virtual machine or Docker
+
+Even would be possible to have several possibilities is strongly suggested to avoid Virtual machines and avoid Docker.
+
+## Build issues
+
+The build involves a lot of packages and in case you face to issues at the end on Qt or Rust, please reduce the cores enabled for the build.
+
+In **local.conf** set the following variable
+
+```python
+BB_NUMBER_THREADS="4"
+```
+
+The build may fail many times. In that case restart bitbake again and again until it works.
+
+
+## Errors during package build
+
+It is possible to overcome errors on specific package build, restarting its build from scratch and restart the normal `bitbake -k system-astrial-image`.
+
+NOTE: replace PKGNAME with the package name you want to rebuild
+
+```shell
+bitbake -c cleansstate PKGNAME
+bitbake -k system-astrial-image
 ```
