@@ -133,14 +133,24 @@ TARGET_FPU           = ""
 
 # Board programming
 
+The artifacts are located in the directory `tmp/deploy/images/astrial-imx8mp`.
+
+The files needed to program the board are the following:
+
+- **imx-boot-astrial-imx8mp-sd.bin-flash_evk**
+- **system-astrial-image-astrial-imx8mp-20240301095121.rootfs.wic.zst**
+
+**NOTE**: replace the timestamp '20240301095121' with the proper one.
+
+
 ## MicroSD programming
 
-NOTE: replace `/dev/sdX` with a proper device name and replace the timestamp '20240219080646' with the proper one.
+**NOTE**: replace `/dev/sdX` with a proper device name.
 
 ```bash
 sudo umount /dev/sdX*
 
-sudo bmaptool copy imx-image-full-astrial-imx8mp-20240219080646.rootfs.wic.zst /dev/sdX
+sudo bmaptool copy system-astrial-image-astrial-imx8mp-20240301095121.rootfs.wic.zst /dev/sdX
 ```
 
 ## eMMC programming
@@ -165,35 +175,35 @@ chmod +x ./uuu
 
 In case you want to use `uuu` for Windows, please use the file `uuu.exe`
 
-## Program the eMMC
 
-The artifacts are located in the directory `tmp/deploy/images/astrial-imx8mp`.
+## Reset the board to USB-OTG programming mode
+
+In case you need to restore the Astrial SoM to its factory state, delete the existing bootloder from eMMC.
+
+Enter in the u-boot shell pressing a key in the serial terminal during boot, then enter the following commands:
+
+```
+mmc dev 2 1
+mmc erase 0 0x1000
+reset
+```
+
+## Program the eMMC
 
 Uncompress the file **wic.zst**
 
-NOTE: replace the timestamp '20240219080646' with the proper one.
-
 ```bash
-unzstd -d imx-image-full-astrial-imx8mp-20240219080646.rootfs.wic.zst
+unzstd -d system-astrial-image-astrial-imx8mp-20240301095121.rootfs.wic.zst
 ```
 
 1. Connect a microUSB cable to USB-OTG (J11) on the **Raspberry CM4-IO board** to your PC.
 1. Run the following command to program the eMMC
 
 ```bash
-sudo ./uuu -b emmc_all imx-boot-astrial-sd.bin-flash_evk imx-image-full-astrial-imx8mp-20240219080646.rootfs.wic
+sudo ./uuu -b emmc_all imx-boot-astrial-imx8mp-sd.bin-flash_evk system-astrial-image-astrial-imx8mp-20240301095121.rootfs.wic
 ```
 
-
-## eMMC erase
-
-In case you need to restore the Astrial SoM to its factory state, these are the steps to erase the eMMC flash memory on Astrial SoM from the U-Boot bootloader.
-
-Boot the board, and press a key in the serial terminal to enter in the u-boot shell, then enter the following command:
-
-```bash
-mmc erase 0 0x1000
-```
+At the end, power off the board, disconnect the microUSB cable from USB-OTG and power it on again.
 
 
 ---------------------
@@ -223,6 +233,8 @@ Even would be possible to have several possibilities is strongly suggested to av
 
 ## Build issues
 
+On a powerful PC the build process should be straightforward, however in some specific conditions you may face to some issues.
+
 The build involves a lot of packages and in case you face to issues at the end on Qt or Rust, please reduce the cores enabled for the build.
 
 In **local.conf** set the following variable
@@ -238,9 +250,25 @@ The build may fail many times. In that case restart bitbake again and again unti
 
 It is possible to overcome errors on specific package build, restarting its build from scratch and restart the normal `bitbake -k system-astrial-image`.
 
-NOTE: replace PKGNAME with the package name you want to rebuild
+**NOTE**: replace PKGNAME with the package name you want to rebuild
 
 ```shell
 bitbake -c cleansstate PKGNAME
 bitbake -k system-astrial-image
+```
+
+## Test the USB-OTG connection
+
+When the board doesn't have a bootloader programmed would be possible to run the command `uuu -lsusb` 
+to test the USB-OTG connection is functional as expected. The expected output is the following:
+
+```bash
+sudo ./uuu -lsusb
+
+uuu (Universal Update Utility) for nxp imx chips -- libuuu_1.5.125-0-gaeb3490
+
+Connected Known USB Devices
+	Path	 Chip	 Pro	 Vid	 Pid	 BcdVersion
+	==================================================
+	3:6	 MX865	 SDPS:	 0x1FC9	0x0146	 0x0002
 ```
