@@ -9,3 +9,7 @@ SRCREV = "e6ab9f07454504def424200d5673be22d318a242"
 
 # set local version
 LOCALVERSION = "-sysele"
+
+FILESEXTRAPATHS:prepend := "${THISDIR}/${PN}:"
+
+SRC_URI += "file://0001-backport-pca9450-driver-from-upstream-83808c5.patch"

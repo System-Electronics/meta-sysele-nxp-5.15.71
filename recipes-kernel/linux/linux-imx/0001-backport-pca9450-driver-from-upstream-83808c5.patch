@@ -1,0 +1,264 @@
+From e9c6b3cc42252c7864a84c50037ad3116b7b3b1a Mon Sep 17 00:00:00 2001
+From: Manuel Rota <manuel.rota@kalpa.it>
+Date: Wed, 17 Jul 2024 11:08:06 +0000
+Subject: [PATCH] backport pca9450 driver from upstream 83808c5
+
+---
+ drivers/regulator/pca9450-regulator.c | 87 ++++++++++++---------------
+ include/linux/regulator/pca9450.h     | 11 +++-
+ 2 files changed, 46 insertions(+), 52 deletions(-)
+
+diff --git a/drivers/regulator/pca9450-regulator.c b/drivers/regulator/pca9450-regulator.c
+index e7408598c..fbffa025a 100644
+--- a/drivers/regulator/pca9450-regulator.c
++++ b/drivers/regulator/pca9450-regulator.c
+@@ -107,6 +107,14 @@ static const struct linear_range pca9450_dvs_buck_volts[] = {
+ 	REGULATOR_LINEAR_RANGE(600000,  0x00, 0x7F, 12500),
+ };
+ 
++/*
++ * BUCK1/3
++ * 0.65 to 2.2375V (12.5mV step)
++ */
++static const struct linear_range pca9451a_dvs_buck_volts[] = {
++	REGULATOR_LINEAR_RANGE(650000, 0x00, 0x7F, 12500),
++};
++
+ /*
+  * BUCK4/5/6
+  * 0.6V to 3.4V (25mV step)
+@@ -174,6 +182,14 @@ static int buck_set_dvs(const struct regulator_desc *desc,
+ 		}
+ 	}
+ 
++	if (ret == 0) {
++		struct pca9450_regulator_desc *regulator = container_of(desc,
++					struct pca9450_regulator_desc, desc);
++
++		/* Enable DVS control through PMIC_STBY_REQ for this BUCK */
++		ret = regmap_update_bits(regmap, regulator->desc.enable_reg,
++					 BUCK1_DVS_CTRL, BUCK1_DVS_CTRL);
++	}
+ 	return ret;
+ }
+ 
+@@ -232,7 +248,6 @@ static const struct pca9450_regulator_desc pca9450a_regulators[] = {
+ 			.ramp_mask = BUCK1_RAMP_MASK,
+ 			.ramp_delay_table = pca9450_dvs_buck_ramp_table,
+ 			.n_ramp_values = ARRAY_SIZE(pca9450_dvs_buck_ramp_table),
+-			.enable_val = BUCK_ENMODE_ONREQ,
+ 			.owner = THIS_MODULE,
+ 			.of_parse_cb = pca9450_set_dvs_levels,
+ 		},
+@@ -258,7 +273,6 @@ static const struct pca9450_regulator_desc pca9450a_regulators[] = {
+ 			.vsel_mask = BUCK2OUT_DVS0_MASK,
+ 			.enable_reg = PCA9450_REG_BUCK2CTRL,
+ 			.enable_mask = BUCK2_ENMODE_MASK,
+-			.enable_val = BUCK_ENMODE_ONREQ_STBYREQ,
+ 			.ramp_reg = PCA9450_REG_BUCK2CTRL,
+ 			.ramp_mask = BUCK2_RAMP_MASK,
+ 			.ramp_delay_table = pca9450_dvs_buck_ramp_table,
+@@ -288,7 +302,6 @@ static const struct pca9450_regulator_desc pca9450a_regulators[] = {
+ 			.vsel_mask = BUCK3OUT_DVS0_MASK,
+ 			.enable_reg = PCA9450_REG_BUCK3CTRL,
+ 			.enable_mask = BUCK3_ENMODE_MASK,
+-			.enable_val = BUCK_ENMODE_ONREQ,
+ 			.ramp_reg = PCA9450_REG_BUCK3CTRL,
+ 			.ramp_mask = BUCK3_RAMP_MASK,
+ 			.ramp_delay_table = pca9450_dvs_buck_ramp_table,
+@@ -318,7 +331,6 @@ static const struct pca9450_regulator_desc pca9450a_regulators[] = {
+ 			.vsel_mask = BUCK4OUT_MASK,
+ 			.enable_reg = PCA9450_REG_BUCK4CTRL,
+ 			.enable_mask = BUCK4_ENMODE_MASK,
+-			.enable_val = BUCK_ENMODE_ONREQ,
+ 			.owner = THIS_MODULE,
+ 		},
+ 	},
+@@ -337,7 +349,6 @@ static const struct pca9450_regulator_desc pca9450a_regulators[] = {
+ 			.vsel_mask = BUCK5OUT_MASK,
+ 			.enable_reg = PCA9450_REG_BUCK5CTRL,
+ 			.enable_mask = BUCK5_ENMODE_MASK,
+-			.enable_val = BUCK_ENMODE_ONREQ,
+ 			.owner = THIS_MODULE,
+ 		},
+ 	},
+@@ -356,7 +367,6 @@ static const struct pca9450_regulator_desc pca9450a_regulators[] = {
+ 			.vsel_mask = BUCK6OUT_MASK,
+ 			.enable_reg = PCA9450_REG_BUCK6CTRL,
+ 			.enable_mask = BUCK6_ENMODE_MASK,
+-			.enable_val = BUCK_ENMODE_ONREQ,
+ 			.owner = THIS_MODULE,
+ 		},
+ 	},
+@@ -472,7 +482,6 @@ static const struct pca9450_regulator_desc pca9450bc_regulators[] = {
+ 			.vsel_mask = BUCK1OUT_DVS0_MASK,
+ 			.enable_reg = PCA9450_REG_BUCK1CTRL,
+ 			.enable_mask = BUCK1_ENMODE_MASK,
+-			.enable_val = BUCK_ENMODE_ONREQ,
+ 			.ramp_reg = PCA9450_REG_BUCK1CTRL,
+ 			.ramp_mask = BUCK1_RAMP_MASK,
+ 			.ramp_delay_table = pca9450_dvs_buck_ramp_table,
+@@ -502,7 +511,6 @@ static const struct pca9450_regulator_desc pca9450bc_regulators[] = {
+ 			.vsel_mask = BUCK2OUT_DVS0_MASK,
+ 			.enable_reg = PCA9450_REG_BUCK2CTRL,
+ 			.enable_mask = BUCK2_ENMODE_MASK,
+-			.enable_val = BUCK_ENMODE_ONREQ_STBYREQ,
+ 			.ramp_reg = PCA9450_REG_BUCK2CTRL,
+ 			.ramp_mask = BUCK2_RAMP_MASK,
+ 			.ramp_delay_table = pca9450_dvs_buck_ramp_table,
+@@ -532,7 +540,6 @@ static const struct pca9450_regulator_desc pca9450bc_regulators[] = {
+ 			.vsel_mask = BUCK4OUT_MASK,
+ 			.enable_reg = PCA9450_REG_BUCK4CTRL,
+ 			.enable_mask = BUCK4_ENMODE_MASK,
+-			.enable_val = BUCK_ENMODE_ONREQ,
+ 			.owner = THIS_MODULE,
+ 		},
+ 	},
+@@ -551,7 +558,6 @@ static const struct pca9450_regulator_desc pca9450bc_regulators[] = {
+ 			.vsel_mask = BUCK5OUT_MASK,
+ 			.enable_reg = PCA9450_REG_BUCK5CTRL,
+ 			.enable_mask = BUCK5_ENMODE_MASK,
+-			.enable_val = BUCK_ENMODE_ONREQ,
+ 			.owner = THIS_MODULE,
+ 		},
+ 	},
+@@ -570,7 +576,6 @@ static const struct pca9450_regulator_desc pca9450bc_regulators[] = {
+ 			.vsel_mask = BUCK6OUT_MASK,
+ 			.enable_reg = PCA9450_REG_BUCK6CTRL,
+ 			.enable_mask = BUCK6_ENMODE_MASK,
+-			.enable_val = BUCK_ENMODE_ONREQ,
+ 			.owner = THIS_MODULE,
+ 		},
+ 	},
+@@ -676,8 +681,8 @@ static const struct pca9450_regulator_desc pca9451a_regulators[] = {
+ 			.ops = &pca9450_dvs_buck_regulator_ops,
+ 			.type = REGULATOR_VOLTAGE,
+ 			.n_voltages = PCA9450_BUCK1_VOLTAGE_NUM,
+-			.linear_ranges = pca9450_dvs_buck_volts,
+-			.n_linear_ranges = ARRAY_SIZE(pca9450_dvs_buck_volts),
++			.linear_ranges = pca9451a_dvs_buck_volts,
++			.n_linear_ranges = ARRAY_SIZE(pca9451a_dvs_buck_volts),
+ 			.vsel_reg = PCA9450_REG_BUCK1OUT_DVS0,
+ 			.vsel_mask = BUCK1OUT_DVS0_MASK,
+ 			.enable_reg = PCA9450_REG_BUCK1CTRL,
+@@ -800,42 +805,6 @@ static const struct pca9450_regulator_desc pca9451a_regulators[] = {
+ 			.owner = THIS_MODULE,
+ 		},
+ 	},
+-	{
+-		.desc = {
+-			.name = "ldo2",
+-			.of_match = of_match_ptr("LDO2"),
+-			.regulators_node = of_match_ptr("regulators"),
+-			.id = PCA9450_LDO2,
+-			.ops = &pca9450_ldo_regulator_ops,
+-			.type = REGULATOR_VOLTAGE,
+-			.n_voltages = PCA9450_LDO2_VOLTAGE_NUM,
+-			.linear_ranges = pca9450_ldo2_volts,
+-			.n_linear_ranges = ARRAY_SIZE(pca9450_ldo2_volts),
+-			.vsel_reg = PCA9450_REG_LDO2CTRL,
+-			.vsel_mask = LDO2OUT_MASK,
+-			.enable_reg = PCA9450_REG_LDO2CTRL,
+-			.enable_mask = LDO2_EN_MASK,
+-			.owner = THIS_MODULE,
+-		},
+-	},
+-	{
+-		.desc = {
+-			.name = "ldo3",
+-			.of_match = of_match_ptr("LDO3"),
+-			.regulators_node = of_match_ptr("regulators"),
+-			.id = PCA9450_LDO3,
+-			.ops = &pca9450_ldo_regulator_ops,
+-			.type = REGULATOR_VOLTAGE,
+-			.n_voltages = PCA9450_LDO3_VOLTAGE_NUM,
+-			.linear_ranges = pca9450_ldo34_volts,
+-			.n_linear_ranges = ARRAY_SIZE(pca9450_ldo34_volts),
+-			.vsel_reg = PCA9450_REG_LDO3CTRL,
+-			.vsel_mask = LDO3OUT_MASK,
+-			.enable_reg = PCA9450_REG_LDO3CTRL,
+-			.enable_mask = LDO3_EN_MASK,
+-			.owner = THIS_MODULE,
+-		},
+-	},
+ 	{
+ 		.desc = {
+ 			.name = "ldo4",
+@@ -921,6 +890,7 @@ static int pca9450_i2c_probe(struct i2c_client *i2c,
+ 	struct regulator_config config = { };
+ 	struct pca9450 *pca9450;
+ 	unsigned int device_id, i;
++	unsigned int reset_ctrl;
+ 	int ret;
+ 
+ 	if (!i2c->irq) {
+@@ -1026,14 +996,30 @@ static int pca9450_i2c_probe(struct i2c_client *i2c,
+ 		return ret;
+ 	}
+ 
++	if (of_property_read_bool(i2c->dev.of_node, "nxp,wdog_b-warm-reset"))
++		reset_ctrl = WDOG_B_CFG_WARM;
++	else
++		reset_ctrl = WDOG_B_CFG_COLD_LDO12;
++
+ 	/* Set reset behavior on assertion of WDOG_B signal */
+ 	ret = regmap_update_bits(pca9450->regmap, PCA9450_REG_RESET_CTRL,
+-				WDOG_B_CFG_MASK, WDOG_B_CFG_COLD_LDO12);
++				 WDOG_B_CFG_MASK, reset_ctrl);
+ 	if (ret) {
+ 		dev_err(&i2c->dev, "Failed to set WDOG_B reset behavior\n");
+ 		return ret;
+ 	}
+ 
++	if (of_property_read_bool(i2c->dev.of_node, "nxp,i2c-lt-enable")) {
++		/* Enable I2C Level Translator */
++		ret = regmap_update_bits(pca9450->regmap, PCA9450_REG_CONFIG2,
++					 I2C_LT_MASK, I2C_LT_ON_STANDBY_RUN);
++		if (ret) {
++			dev_err(&i2c->dev,
++				"Failed to enable I2C level translator\n");
++			return ret;
++		}
++	}
++
+ 	/*
+ 	 * The driver uses the LDO5CTRL_H register to control the LDO5 regulator.
+ 	 * This is only valid if the SD_VSEL input of the PMIC is high. Let's
+@@ -1077,6 +1063,7 @@ MODULE_DEVICE_TABLE(of, pca9450_of_match);
+ static struct i2c_driver pca9450_i2c_driver = {
+ 	.driver = {
+ 		.name = "nxp-pca9450",
++		.probe_type = PROBE_PREFER_ASYNCHRONOUS,
+ 		.of_match_table = pca9450_of_match,
+ 	},
+ 	.probe = pca9450_i2c_probe,
+diff --git a/include/linux/regulator/pca9450.h b/include/linux/regulator/pca9450.h
+index 256c360a0..243633c8d 100644
+--- a/include/linux/regulator/pca9450.h
++++ b/include/linux/regulator/pca9450.h
+@@ -197,11 +197,11 @@ enum {
+ 
+ /* PCA9450_REG_LDO3_VOLT bits */
+ #define LDO3_EN_MASK			0xC0
+-#define LDO3OUT_MASK			0x0F
++#define LDO3OUT_MASK			0x1F
+ 
+ /* PCA9450_REG_LDO4_VOLT bits */
+ #define LDO4_EN_MASK			0xC0
+-#define LDO4OUT_MASK			0x0F
++#define LDO4OUT_MASK			0x1F
+ 
+ /* PCA9450_REG_LDO5_VOLT bits */
+ #define LDO5L_EN_MASK			0xC0
+@@ -227,4 +227,11 @@ enum {
+ #define WDOG_B_CFG_COLD_LDO12		0x80
+ #define WDOG_B_CFG_COLD			0xC0
+ 
++/* PCA9450_REG_CONFIG2 bits */
++#define I2C_LT_MASK			0x03
++#define I2C_LT_FORCE_DISABLE		0x00
++#define I2C_LT_ON_STANDBY_RUN		0x01
++#define I2C_LT_ON_RUN			0x02
++#define I2C_LT_FORCE_ENABLE		0x03
++
+ #endif /* __LINUX_REG_PCA9450_H__ */
