@@ -1,4 +1,6 @@
-![System Electronics](https://www.systemelectronics.com/wp-content/uploads/2023/01/cropped-System_Electronics_Coesia_Logo_Vector_CMYK-003.png)
+<p align="center">
+  <img src="https://github.com/System-Electronics/meta-sysele-nxp-5.15.71/blob/main/se_logo.png"/>
+</p>
 
 ----
 
