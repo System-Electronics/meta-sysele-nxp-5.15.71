@@ -4,7 +4,7 @@
   <remote fetch="https://github.com/hailo-ai" name="hailo"/>
   <remote fetch="https://github.com/System-Electronics" name="system"/>
 
-  <project name="meta-hailo" remote="hailo" revision="c093ed15914abd456afd6d81ced6e6b2b77e180e" path="sources-extra/meta-hailo"/>
+  <project name="meta-hailo" remote="hailo" revision="c093ed15914abd456afd6d81ced6e6b2b77e180e"" path="sources-extra/meta-hailo"/>
   <project name="meta-imx8mp-isp-imx219" remote="system" revision="LF5.15.71_P20" path="sources-extra/meta-imx8mp-isp-imx219"/>
   <project name="meta-sysele-nxp-5.15.71" remote="system" revision="main" path="sources-extra/meta-sysele-nxp-5.15.71" >
     <linkfile src="scripts/astrial-setup-env" dest="astrial-setup-env" />
