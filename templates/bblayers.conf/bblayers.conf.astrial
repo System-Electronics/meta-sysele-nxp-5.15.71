@@ -1,4 +1,7 @@
 
+# Intel Realsense Layer
+BBLAYERS += "${BSPDIR}/sources-extra/meta-intel-realsense"
+
 # Hailo layers
 BBLAYERS += "${BSPDIR}/sources-extra/meta-hailo/meta-hailo-accelerator"
 BBLAYERS += "${BSPDIR}/sources-extra/meta-hailo/meta-hailo-libhailort"
