@@ -112,7 +112,7 @@ source setup-environment build
 ##  Build full rootfs image
 
 ```bash
-bitbake -k system-astrial-image
+bitbake system-astrial-image
 ```
 
 You will see a message screen like this
@@ -129,8 +129,6 @@ DISTRO_VERSION       = "5.15-kirkstone"
 TUNE_FEATURES        = "aarch64 armv8a crc crypto"
 TARGET_FPU           = ""
 ```
-
-
 ---------------------------
 
 # Board programming
@@ -245,18 +243,18 @@ In **local.conf** set the following variable
 BB_NUMBER_THREADS="4"
 ```
 
-The build may fail many times. In that case restart bitbake again and again until it works.
+The build may fail many times. In that case check that your PC meets the minimum requirements and restart bitbake again.
 
 
 ## Errors during package build
 
-It is possible to overcome errors on specific package build, restarting its build from scratch and restart the normal `bitbake -k system-astrial-image`.
+It is possible to overcome errors on specific package build, restarting its build from scratch and restart the normal `bitbake system-astrial-image`.
 
 **NOTE**: replace PKGNAME with the package name you want to rebuild
 
 ```shell
 bitbake -c cleansstate PKGNAME
-bitbake -k system-astrial-image
+bitbake system-astrial-image
 ```
 
 ## Test the USB-OTG connection
