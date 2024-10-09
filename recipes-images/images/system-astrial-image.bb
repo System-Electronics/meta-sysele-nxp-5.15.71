@@ -16,7 +16,7 @@ TOOLCHAIN_TARGET_TASK:append = " tensorflow-lite-dev onnxruntime-dev "
 ## Hailo
 IMAGE_INSTALL:append = " libhailort hailortcli pyhailort libgsthailo hailo-pci hailo-firmware"
 IMAGE_INSTALL:append = " libgsthailotools hailo-post-processes"
-IMAGE_INSTALL:append = " tappas-apps"
+IMAGE_INSTALL:append = " tappas-apps tappas-tracers"
 
 #################################################################################################################
 ## KOAN
@@ -25,3 +25,10 @@ IMAGE_INSTALL:append = " \
     packagegroup-fsl-gstreamer1.0 \
     packagegroup-fsl-gstreamer1.0-full \
     "
+
+#################################################################################################################
+## Intel Realsense
+IMAGE_INSTALL:append = " librealsense2 librealsense2-tools"
+IMAGE_INSTALL:append = " librealsense2-debug-tools"
+IMAGE_INSTALL:append = " python3-pyrealsense2"
+
