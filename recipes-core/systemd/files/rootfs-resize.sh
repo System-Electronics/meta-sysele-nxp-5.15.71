@@ -1,4 +1,5 @@
 #!/bin/bash
+set -e
 
 device=$(eval $(lsblk -oMOUNTPOINT,PKNAME -P -M | grep 'MOUNTPOINT="/"'); echo $PKNAME)
 partition=$(eval $(lsblk -oMOUNTPOINT,NAME -P -M | grep 'MOUNTPOINT="/"'); echo $NAME)
