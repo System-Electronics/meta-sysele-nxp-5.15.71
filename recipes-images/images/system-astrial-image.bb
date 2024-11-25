@@ -19,11 +19,13 @@ IMAGE_INSTALL:append = " libgsthailotools hailo-post-processes"
 IMAGE_INSTALL:append = " tappas-apps tappas-tracers"
 
 #################################################################################################################
-## KOAN
+## KOAN + Kalpa
 IMAGE_INSTALL:append = " \
     v4l-utils \
     packagegroup-fsl-gstreamer1.0 \
     packagegroup-fsl-gstreamer1.0-full \
+    parted \
+    rootfs-resize \
     "
 
 #################################################################################################################
