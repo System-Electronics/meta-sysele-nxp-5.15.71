@@ -10,7 +10,7 @@ jobs:
     runs-on: ubuntu-latest
     env:
       YOCTO_BRANCH: kirkstone
-      IMX_BRANCH: lf-6.1.22-2.0.0  # Add specific branch for meta-imx
+      IMX_BRANCH: lf-5.15.71
 
     steps:
     - name: Create directory structure
