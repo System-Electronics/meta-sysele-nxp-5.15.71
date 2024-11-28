@@ -27,16 +27,32 @@ jobs:
 
     - name: Setup Yocto
       run: |
-        # Clone poky
         cd yocto-build
+        
+        # Clone each layer and verify its structure
+        echo "Cloning poky..."
         git clone -b $YOCTO_BRANCH git://git.yoctoproject.org/poky
+        
+        echo "Cloning meta-openembedded..."
         git clone -b $YOCTO_BRANCH git://git.openembedded.org/meta-openembedded
+        
+        echo "Cloning meta-arm..."
         git clone -b $YOCTO_BRANCH git://git.yoctoproject.org/meta-arm
         
-        # Print directory structure for debugging
-        echo "Directory structure:"
-        pwd
-        ls -la
+        # Verify layer structure
+        echo "Checking layer structure..."
+        echo "meta-arm contents:"
+        ls -la meta-arm
+        echo "meta-arm/conf contents:"
+        ls -la meta-arm/conf || echo "conf directory not found in meta-arm"
+        
+        echo "meta-openembedded contents:"
+        ls -la meta-openembedded
+        echo "meta-openembedded/meta-oe contents:"
+        ls -la meta-openembedded/meta-oe
+        
+        echo "meta-sysele-nxp contents:"
+        ls -la meta-sysele-nxp
 
     - name: Configure and Build
       run: |
@@ -45,6 +61,12 @@ jobs:
         
         # Get absolute paths
         WORKSPACE_PATH=$(cd ../.. && pwd)
+        
+        # First verify meta-arm layer.conf exists
+        if [ ! -f "${WORKSPACE_PATH}/meta-arm/conf/layer.conf" ]; then
+            echo "ERROR: meta-arm layer.conf is missing!"
+            exit 1
+        fi
         
         # Add layers to bblayers.conf using absolute paths
         cat << EOF >> conf/bblayers.conf
@@ -59,6 +81,8 @@ jobs:
         DISTRO = "poky"
         DL_DIR = "${WORKSPACE_PATH}/downloads"
         SSTATE_DIR = "${WORKSPACE_PATH}/sstate-cache"
+        BB_NUMBER_THREADS = "4"
+        PARALLEL_MAKE = "-j 4"
         EOF
         
         # Print configurations for debugging
