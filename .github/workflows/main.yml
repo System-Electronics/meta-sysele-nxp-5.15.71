@@ -3,7 +3,7 @@ name: Yocto Build
 on:
   push:
     branches:
-      - '**'
+      - '**'  # Matches all branches
 
 jobs:
   yocto-build:
@@ -12,10 +12,15 @@ jobs:
       YOCTO_BRANCH: kirkstone
 
     steps:
+    - name: Create working directory
+      run: |
+        mkdir -p ${GITHUB_WORKSPACE}/yocto-build
+        cd ${GITHUB_WORKSPACE}/yocto-build
+
     - name: Checkout meta layer
       uses: actions/checkout@v3
       with:
-        path: meta-sysele-nxp
+        path: yocto-build/meta-sysele-nxp
 
     - name: Install dependencies
       run: |
@@ -26,24 +31,37 @@ jobs:
         python3-subunit mesa-common-dev zstd liblz4-tool
 
     - name: Setup Yocto
+      working-directory: yocto-build
       run: |
+        # Clone poky
         git clone -b $YOCTO_BRANCH git://git.yoctoproject.org/poky
-        cd poky
+        
+        # Clone required layers
         git clone -b $YOCTO_BRANCH git://git.openembedded.org/meta-openembedded
         git clone -b $YOCTO_BRANCH git://git.yoctoproject.org/meta-arm
-        ln -s ../meta-sysele-nxp .
 
     - name: Configure and Build
+      working-directory: yocto-build
       run: |
         cd poky
         source oe-init-build-env build
-        echo 'BBLAYERS += "${TOPDIR}/../meta-openembedded/meta-oe"' >> conf/bblayers.conf
-        echo 'BBLAYERS += "${TOPDIR}/../meta-arm"' >> conf/bblayers.conf
-        echo 'BBLAYERS += "${TOPDIR}/../meta-sysele-nxp"' >> conf/bblayers.conf
         
-        echo 'MACHINE = "your-machine-name"' >> conf/local.conf
-        echo 'DISTRO = "poky"' >> conf/local.conf
+        # Add layers to bblayers.conf
+        cat << EOF >> conf/bblayers.conf
+        BBLAYERS += "${TOPDIR}/../meta-openembedded/meta-oe"
+        BBLAYERS += "${TOPDIR}/../meta-arm"
+        BBLAYERS += "${TOPDIR}/../meta-sysele-nxp"
+        EOF
         
+        # Configure local.conf
+        cat << EOF >> conf/local.conf
+        MACHINE = "your-machine-name"
+        DISTRO = "poky"
+        DL_DIR = "${TOPDIR}/../downloads"
+        SSTATE_DIR = "${TOPDIR}/../sstate-cache"
+        EOF
+        
+        # Start the build
         bitbake core-image-minimal
 
     - name: Archive artifacts
@@ -51,4 +69,4 @@ jobs:
       uses: actions/upload-artifact@v3
       with:
         name: yocto-build-artifacts
-        path: poky/build/tmp/deploy/images/**/*
+        path: yocto-build/poky/build/tmp/deploy/images/**/*
