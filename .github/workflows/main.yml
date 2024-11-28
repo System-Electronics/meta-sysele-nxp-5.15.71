@@ -44,14 +44,10 @@ jobs:
           wget --directory-prefix .repo/local_manifests https://raw.githubusercontent.com/System-Electronics/meta-sysele-nxp-5.15.71/main/manifest/astrial-5.15.71.xml
           repo sync
 
-      - name: Setup Build Environment
+      - name: Build Image
         run: |
           cd yocto-astrial
           source astrial-setup-env -b build
-
-      - name: Build Image
-        run: |
-          cd yocto-astrial/build
           bitbake system-astrial-image
 
       - name: Archive Build Artifacts
