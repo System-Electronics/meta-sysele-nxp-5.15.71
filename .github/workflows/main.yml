@@ -10,7 +10,7 @@ jobs:
     runs-on: ubuntu-latest
     env:
       YOCTO_BRANCH: kirkstone
-      IMX_BRANCH: lf-5.15.71
+      IMX_BRANCH: kirkstone-5.15.71-2.2.2
 
     steps:
     - name: Create directory structure
