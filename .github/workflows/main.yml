@@ -6,122 +6,58 @@ on:
       - '**'  # Matches all branches
 
 jobs:
-  yocto-build:
-    runs-on: ubuntu-latest
-    env:
-      YOCTO_BRANCH: kirkstone
-      IMX_BRANCH: kirkstone-5.15.71-2.2.2
-
+  build:
+    runs-on: ubuntu-22.04
     steps:
-    - name: Create directory structure
-      run: |
-        mkdir -p yocto-build/sources
-        mkdir -p yocto-build/sources-extra
+      - name: Free Disk Space
+        run: |
+          sudo rm -rf /usr/share/dotnet
+          sudo rm -rf /usr/local/lib/android
+          sudo rm -rf /opt/ghc
+          sudo rm -rf /opt/hostedtoolcache
+          df -h
 
-    - name: Checkout meta layer
-      uses: actions/checkout@v3
-      with:
-        path: yocto-build/sources-extra/meta-sysele-nxp
+      - name: Install Dependencies
+        run: |
+          sudo apt-get update
+          sudo apt-get upgrade -y
+          sudo apt-get install -y gawk wget git diffstat unzip texinfo gcc build-essential \
+            chrpath socat cpio python3 python3-pip python3-pexpect xz-utils debianutils \
+            iputils-ping python3-git python3-jinja2 libegl1-mesa libsdl1.2-dev \
+            python3-subunit mesa-common-dev zstd liblz4-tool file locales libacl1 \
+            curl python-is-python3 bmap-tools
+          sudo locale-gen en_US.UTF-8
 
-    - name: Install dependencies
-      run: |
-        sudo apt-get update
-        sudo apt-get install -y gawk wget git diffstat unzip texinfo gcc build-essential \
-        chrpath socat cpio python3 python3-pip python3-pexpect xz-utils debianutils \
-        iputils-ping python3-git python3-jinja2 libegl1-mesa libsdl1.2-dev pylint xterm \
-        python3-subunit mesa-common-dev zstd liblz4-tool
+      - name: Install repo tool
+        run: |
+          mkdir -p ~/bin
+          curl http://commondatastorage.googleapis.com/git-repo-downloads/repo > ~/bin/repo
+          chmod a+x ~/bin/repo
+          echo "${HOME}/bin" >> $GITHUB_PATH
 
-    - name: Clone layers
-      run: |
-        cd yocto-build/sources
-        
-        # Core layers
-        git clone -b $YOCTO_BRANCH git://git.yoctoproject.org/poky
-        git clone -b $YOCTO_BRANCH git://git.openembedded.org/meta-openembedded
-        git clone -b $YOCTO_BRANCH https://github.com/Freescale/meta-freescale.git
-        git clone -b $YOCTO_BRANCH https://github.com/Freescale/meta-freescale-3rdparty.git
-        git clone -b $YOCTO_BRANCH https://github.com/Freescale/meta-freescale-distro.git
-        
-        # i.MX specific layers - using IMX_BRANCH
-        git clone -b $IMX_BRANCH https://github.com/nxp-imx/meta-imx.git
-        git clone -b $IMX_BRANCH https://source.codeaurora.org/external/imx/meta-nxp-demo-experience
-        
-        # Additional required layers
-        git clone -b $YOCTO_BRANCH https://github.com/OSSystems/meta-browser.git
-        git clone -b $YOCTO_BRANCH https://github.com/kraj/meta-clang.git
-        git clone -b $YOCTO_BRANCH https://code.qt.io/yocto/meta-qt6.git
-        git clone -b $YOCTO_BRANCH https://git.yoctoproject.org/meta-virtualization
+      - name: Initialize Yocto Environment
+        run: |
+          mkdir yocto-astrial
+          cd yocto-astrial
+          repo init -u https://github.com/nxp-imx/imx-manifest -b imx-linux-kirkstone -m imx-5.15.71-2.2.0.xml
+          mkdir -p .repo/local_manifests
+          wget --directory-prefix .repo/local_manifests https://raw.githubusercontent.com/System-Electronics/meta-sysele-nxp-5.15.71/main/manifest/astrial-5.15.71.xml
+          repo sync
 
-        # Clone Hailo layers
-        cd ../sources-extra
-        git clone -b $YOCTO_BRANCH https://github.com/hailo-ai/meta-hailo.git
+      - name: Setup Build Environment
+        run: |
+          cd yocto-astrial
+          source astrial-setup-env -b build
 
-    - name: Configure and Build
-      run: |
-        cd yocto-build/sources/poky
-        source oe-init-build-env ../../build
-        
-        # Get absolute paths
-        BSPDIR=$(cd ../.. && pwd)
-        
-        # Configure bblayers.conf
-        cat << EOF > conf/bblayers.conf
-        LCONF_VERSION = "7"
-        BBPATH = "\${TOPDIR}"
-        BSPDIR := "\${@os.path.abspath(os.path.dirname(d.getVar('FILE', True)) + '/../..')}"
-        BBFILES ?= ""
-        BBLAYERS = " \\
-          \${BSPDIR}/sources/poky/meta \\
-          \${BSPDIR}/sources/poky/meta-poky \\
-          \\
-          \${BSPDIR}/sources/meta-openembedded/meta-oe \\
-          \${BSPDIR}/sources/meta-openembedded/meta-multimedia \\
-          \${BSPDIR}/sources/meta-openembedded/meta-python \\
-          \\
-          \${BSPDIR}/sources/meta-freescale \\
-          \${BSPDIR}/sources/meta-freescale-3rdparty \\
-          \${BSPDIR}/sources/meta-freescale-distro \\
-        "
-        
-        # i.MX Yocto Project Release layers
-        BBLAYERS += "\${BSPDIR}/sources/meta-imx/meta-bsp"
-        BBLAYERS += "\${BSPDIR}/sources/meta-imx/meta-sdk"
-        BBLAYERS += "\${BSPDIR}/sources/meta-imx/meta-ml"
-        BBLAYERS += "\${BSPDIR}/sources/meta-imx/meta-v2x"
-        BBLAYERS += "\${BSPDIR}/sources/meta-nxp-demo-experience"
-        BBLAYERS += "\${BSPDIR}/sources/meta-browser/meta-chromium"
-        BBLAYERS += "\${BSPDIR}/sources/meta-clang"
-        BBLAYERS += "\${BSPDIR}/sources/meta-openembedded/meta-gnome"
-        BBLAYERS += "\${BSPDIR}/sources/meta-openembedded/meta-networking"
-        BBLAYERS += "\${BSPDIR}/sources/meta-openembedded/meta-filesystems"
-        BBLAYERS += "\${BSPDIR}/sources/meta-qt6"
-        BBLAYERS += "\${BSPDIR}/sources/meta-virtualization"
-        
-        # Hailo layers
-        BBLAYERS += "\${BSPDIR}/sources-extra/meta-hailo/meta-hailo-accelerator"
-        BBLAYERS += "\${BSPDIR}/sources-extra/meta-hailo/meta-hailo-libhailort"
-        BBLAYERS += "\${BSPDIR}/sources-extra/meta-hailo/meta-hailo-tappas"
-        
-        # System Electronics layer
-        BBLAYERS += "\${BSPDIR}/sources-extra/meta-sysele-nxp"
-        EOF
-        
-        # Configure local.conf
-        cat << EOF >> conf/local.conf
-        MACHINE = "astrial-imx8mp"
-        DISTRO = "poky"
-        DL_DIR = "\${BSPDIR}/downloads"
-        SSTATE_DIR = "\${BSPDIR}/sstate-cache"
-        BB_NUMBER_THREADS = "4"
-        PARALLEL_MAKE = "-j 4"
-        ACCEPT_FSL_EULA = "1"
-        EOF
-        
-        # Start the build
-        bitbake core-image-minimal
-    - name: Archive artifacts
-      if: success()
-      uses: actions/upload-artifact@v3
-      with:
-        name: yocto-build-artifacts
-        path: yocto-build/build/tmp/deploy/images/**/*
+      - name: Build Image
+        run: |
+          cd yocto-astrial/build
+          bitbake system-astrial-image
+
+      - name: Archive Build Artifacts
+        uses: actions/upload-artifact@v3
+        with:
+          name: yocto-build
+          path: |
+            yocto-astrial/build/tmp/deploy/images/astrial-imx8mp/imx-boot-astrial-imx8mp-sd.bin-flash_evk
+            yocto-astrial/build/tmp/deploy/images/astrial-imx8mp/system-astrial-image-astrial-imx8mp-*.rootfs.wic.zst
