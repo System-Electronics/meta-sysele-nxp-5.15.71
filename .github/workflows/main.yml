@@ -10,14 +10,8 @@ jobs:
     runs-on: ubuntu-latest
     env:
       YOCTO_BRANCH: kirkstone
-      WORKDIR: ${GITHUB_WORKSPACE}/yocto-build
 
     steps:
-    - name: Create working directory
-      run: |
-        mkdir -p ${GITHUB_WORKSPACE}/yocto-build
-        cd ${GITHUB_WORKSPACE}/yocto-build
-
     - name: Checkout meta layer
       uses: actions/checkout@v3
       with:
@@ -32,41 +26,48 @@ jobs:
         python3-subunit mesa-common-dev zstd liblz4-tool
 
     - name: Setup Yocto
-      working-directory: yocto-build
       run: |
         # Clone poky
+        cd yocto-build
         git clone -b $YOCTO_BRANCH git://git.yoctoproject.org/poky
-        
-        # Clone required layers
         git clone -b $YOCTO_BRANCH git://git.openembedded.org/meta-openembedded
         git clone -b $YOCTO_BRANCH git://git.yoctoproject.org/meta-arm
+        
+        # Print directory structure for debugging
+        echo "Directory structure:"
+        pwd
+        ls -la
 
     - name: Configure and Build
-      working-directory: yocto-build
       run: |
-        cd poky
+        cd yocto-build/poky
         source oe-init-build-env build
+        
+        # Get absolute paths
+        WORKSPACE_PATH=$(cd ../.. && pwd)
         
         # Add layers to bblayers.conf using absolute paths
         cat << EOF >> conf/bblayers.conf
-        BBLAYERS += "${WORKDIR}/meta-openembedded/meta-oe"
-        BBLAYERS += "${WORKDIR}/meta-arm"
-        BBLAYERS += "${WORKDIR}/meta-sysele-nxp"
+        BBLAYERS += "${WORKSPACE_PATH}/meta-openembedded/meta-oe"
+        BBLAYERS += "${WORKSPACE_PATH}/meta-arm"
+        BBLAYERS += "${WORKSPACE_PATH}/meta-sysele-nxp"
         EOF
         
         # Configure local.conf
         cat << EOF >> conf/local.conf
         MACHINE = "your-machine-name"
         DISTRO = "poky"
-        DL_DIR = "${WORKDIR}/downloads"
-        SSTATE_DIR = "${WORKDIR}/sstate-cache"
+        DL_DIR = "${WORKSPACE_PATH}/downloads"
+        SSTATE_DIR = "${WORKSPACE_PATH}/sstate-cache"
         EOF
         
-        # Print directory structure for debugging
+        # Print configurations for debugging
         echo "Current working directory:"
         pwd
+        echo "Workspace path:"
+        echo $WORKSPACE_PATH
         echo "Directory structure:"
-        ls -la ${WORKDIR}
+        ls -la $WORKSPACE_PATH
         echo "Layers configuration:"
         cat conf/bblayers.conf
         
