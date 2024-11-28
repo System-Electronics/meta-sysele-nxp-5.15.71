@@ -51,6 +51,7 @@ jobs:
         cat << EOF >> conf/bblayers.conf
         BBLAYERS += "${WORKSPACE_PATH}/meta-openembedded/meta-oe"
         BBLAYERS += "${WORKSPACE_PATH}/meta-arm/meta-arm"
+        BBLAYERS += "${WORKSPACE_PATH}/meta-arm/meta-arm-toolchain"
         BBLAYERS += "${WORKSPACE_PATH}/meta-sysele-nxp"
         EOF
         
