@@ -57,7 +57,7 @@ jobs:
         
         # Configure local.conf
         cat << EOF >> conf/local.conf
-        MACHINE = "your-machine-name"
+        MACHINE = "astrial-imx8mp"
         DISTRO = "poky"
         DL_DIR = "${WORKSPACE_PATH}/downloads"
         SSTATE_DIR = "${WORKSPACE_PATH}/sstate-cache"
