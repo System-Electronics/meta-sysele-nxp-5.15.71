@@ -1,0 +1,56 @@
+name: Yocto Build
+
+on:
+  push:
+    branches: [ main, master ]
+  pull_request:
+    branches: [ main, master ]
+  workflow_dispatch:
+
+jobs:
+  yocto-build:
+    runs-on: ubuntu-latest
+    env:
+      YOCTO_BRANCH: kirkstone
+
+    steps:
+    - name: Checkout meta layer
+      uses: actions/checkout@v3
+      with:
+        path: meta-sysele-nxp
+
+    - name: Install dependencies
+      run: |
+        sudo apt-get update
+        sudo apt-get install -y gawk wget git diffstat unzip texinfo gcc build-essential \
+        chrpath socat cpio python3 python3-pip python3-pexpect xz-utils debianutils \
+        iputils-ping python3-git python3-jinja2 libegl1-mesa libsdl1.2-dev pylint xterm \
+        python3-subunit mesa-common-dev zstd liblz4-tool
+
+    - name: Setup Yocto
+      run: |
+        git clone -b $YOCTO_BRANCH git://git.yoctoproject.org/poky
+        cd poky
+        git clone -b $YOCTO_BRANCH git://git.openembedded.org/meta-openembedded
+        git clone -b $YOCTO_BRANCH git://git.yoctoproject.org/meta-arm
+        ln -s ../meta-sysele-nxp .
+
+    - name: Configure and Build
+      run: |
+        cd poky
+        source oe-init-build-env build
+        echo 'BBLAYERS += "${TOPDIR}/../meta-openembedded/meta-oe"' >> conf/bblayers.conf
+        echo 'BBLAYERS += "${TOPDIR}/../meta-arm"' >> conf/bblayers.conf
+        echo 'BBLAYERS += "${TOPDIR}/../meta-sysele-nxp"' >> conf/bblayers.conf
+        
+        echo 'MACHINE = "your-machine-name"' >> conf/local.conf
+        echo 'DISTRO = "poky"' >> conf/local.conf
+        
+        bitbake core-image-minimal
+
+    - name: Archive artifacts
+      if: success()
+      uses: actions/upload-artifact@v3
+      with:
+        name: yocto-build-artifacts
+        path: poky/build/tmp/deploy/images/**/*
