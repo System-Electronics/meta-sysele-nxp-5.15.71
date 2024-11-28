@@ -10,6 +10,7 @@ jobs:
     runs-on: ubuntu-latest
     env:
       YOCTO_BRANCH: kirkstone
+      WORKDIR: ${GITHUB_WORKSPACE}/yocto-build
 
     steps:
     - name: Create working directory
@@ -46,20 +47,28 @@ jobs:
         cd poky
         source oe-init-build-env build
         
-        # Add layers to bblayers.conf
+        # Add layers to bblayers.conf using absolute paths
         cat << EOF >> conf/bblayers.conf
-        BBLAYERS += "${TOPDIR}/../meta-openembedded/meta-oe"
-        BBLAYERS += "${TOPDIR}/../meta-arm"
-        BBLAYERS += "${TOPDIR}/../meta-sysele-nxp"
+        BBLAYERS += "${WORKDIR}/meta-openembedded/meta-oe"
+        BBLAYERS += "${WORKDIR}/meta-arm"
+        BBLAYERS += "${WORKDIR}/meta-sysele-nxp"
         EOF
         
         # Configure local.conf
         cat << EOF >> conf/local.conf
         MACHINE = "your-machine-name"
         DISTRO = "poky"
-        DL_DIR = "${TOPDIR}/../downloads"
-        SSTATE_DIR = "${TOPDIR}/../sstate-cache"
+        DL_DIR = "${WORKDIR}/downloads"
+        SSTATE_DIR = "${WORKDIR}/sstate-cache"
         EOF
+        
+        # Print directory structure for debugging
+        echo "Current working directory:"
+        pwd
+        echo "Directory structure:"
+        ls -la ${WORKDIR}
+        echo "Layers configuration:"
+        cat conf/bblayers.conf
         
         # Start the build
         bitbake core-image-minimal
