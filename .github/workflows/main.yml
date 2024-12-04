@@ -29,7 +29,7 @@ jobs:
 
       - name: Initialize Yocto Environment
         run: |
-          mkdir yocto-astrial
+          mkdir -p yocto-astrial
           cd yocto-astrial
           repo init -u https://github.com/nxp-imx/imx-manifest -b imx-linux-kirkstone -m imx-5.15.71-2.2.0.xml
           mkdir -p .repo/local_manifests
