@@ -34,3 +34,8 @@ IMAGE_INSTALL:append = " librealsense2 librealsense2-tools"
 IMAGE_INSTALL:append = " librealsense2-debug-tools"
 IMAGE_INSTALL:append = " python3-pyrealsense2"
 
+#################################################################################################################
+## GitHub.com Signing
+IMAGE_INSTALL:append = " os-release-sign "
+
+#################################################################################################################
