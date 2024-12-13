@@ -34,3 +34,15 @@ IMAGE_INSTALL:append = " librealsense2 librealsense2-tools"
 IMAGE_INSTALL:append = " librealsense2-debug-tools"
 IMAGE_INSTALL:append = " python3-pyrealsense2"
 
+#################################################################################################################
+## Development libs for Hailo/OpenCV
+IMAGE_INSTALL:append = " libgsthailo-dev libhailort-dev libgsthailotools-dev "
+
+#################################################################################################################
+## OpenCV development headers
+IMAGE_INSTALL:append = " opencv opencv-dev libopencv-core-dev libopencv-highgui-dev libopencv-imgproc-dev libopencv-objdetect-dev libopencv-ml-dev libopencv-ts-dev"
+
+#################################################################################################################
+## Tools Extra
+IMAGE_INSTALL:append = " git joe du-dust python3-shtab python3-tldr"
+
