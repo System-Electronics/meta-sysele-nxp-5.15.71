@@ -13,3 +13,4 @@ LOCALVERSION = "-sysele"
 FILESEXTRAPATHS:prepend := "${THISDIR}/${PN}:"
 
 SRC_URI += "file://0001-backport-pca9450-driver-from-upstream-83808c5.patch"
+SRC_URI += "file://caam.cfg"
