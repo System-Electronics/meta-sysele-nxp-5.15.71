@@ -1,0 +1,22 @@
+From 696090c5cb83a36ea78fe249b22caf0476980f50 Mon Sep 17 00:00:00 2001
+From: "Manuel Rota" <manuel.rota@kalpa.it>
+Date: Wed, 22 Jan 2025 10:43:53 +0000
+Subject: [PATCH] fix: core-json as static library
+
+---
+ simw-top/ext/core-json.cmake | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/simw-top/ext/core-json.cmake b/simw-top/ext/core-json.cmake
+index 7764209..e05412f 100644
+--- a/simw-top/ext/core-json.cmake
++++ b/simw-top/ext/core-json.cmake
+@@ -12,7 +12,7 @@ FILE(
+ )
+ 
+ ADD_LIBRARY(
+-    ${PROJECT_NAME}
++    ${PROJECT_NAME} STATIC
+     ${json_files}
+ )
+ 

@@ -1,0 +1,25 @@
+From 3ff493f99227c4446031169fa4bd0c370f96592b Mon Sep 17 00:00:00 2001
+From: "Manuel Rota" <manuel.rota@kalpa.it>
+Date: Wed, 22 Jan 2025 10:43:26 +0000
+Subject: [PATCH] fix: openssl 3 compatibility
+
+---
+ simw-top/sss/plugin/openssl/engine/src/ax_sssEngine_rsa.c | 2 ++
+ 1 file changed, 2 insertions(+)
+
+diff --git a/simw-top/sss/plugin/openssl/engine/src/ax_sssEngine_rsa.c b/simw-top/sss/plugin/openssl/engine/src/ax_sssEngine_rsa.c
+index 7127260..36267ce 100644
+--- a/simw-top/sss/plugin/openssl/engine/src/ax_sssEngine_rsa.c
++++ b/simw-top/sss/plugin/openssl/engine/src/ax_sssEngine_rsa.c
+@@ -95,9 +95,11 @@ sss_algorithm_t getEncryptAlgorithmfromPaddingType(int padding, int bit_length)
+     case RSA_NO_PADDING: {
+         algo = kAlgorithm_SSS_RSASSA_NO_PADDING;
+     } break;
++#if OPENSSL_VERSION_MAJOR < 3
+     case RSA_SSLV23_PADDING: {
+         algo = kAlgorithm_None;
+     } break;
++#endif
+     case RSA_PKCS1_OAEP_PADDING: {
+         switch (bit_length) {
+         case 1024:
