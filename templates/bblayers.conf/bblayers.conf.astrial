@@ -10,5 +10,8 @@ BBLAYERS += "${BSPDIR}/sources-extra/meta-hailo/meta-hailo-tappas"
 # NXP IMX219 layer
 BBLAYERS += "${BSPDIR}/sources-extra/meta-imx8mp-isp-imx219"
 
+# Secure Boot layer
+BBLAYERS += "${BSPDIR}/sources-extra/meta-nxp-security-reference-design/meta-secure-boot"
+
 # System Electronics layer
 BBLAYERS += "${BSPDIR}/sources-extra/meta-sysele-nxp-5.15.71"
