@@ -23,7 +23,8 @@ INSANE_SKIP:${PN} += "dev-so"
 S = "${WORKDIR}/${NXP_PLUG_TRUST_MW}/simw-top"
 B = "${WORKDIR}/${NXP_PLUG_TRUST_MW}/build"
 
-SRC_URI = "file://${NXP_PLUG_TRUST_MW}.zip \
+SMW_URI = "file://${NXP_PLUG_TRUST_MW}.zip"
+SRC_URI = "${SMW_URI} \
            file://0001-fix-openssl-3-compatibility.patch;patchdir=.. \
            file://0002-fix-core-json-as-static-library.patch;patchdir=.. \
            file://0003-fix-remove-use-of-missing-python-cryptography-api.patch;patchdir=.. \
@@ -57,6 +58,18 @@ FILES:${PN} += "${datadir}/se05x \
                 ${libdir}/*.so.* \
                 "
 FILES:${PN}-dev = "${includedir} ${libdir}/cmake"
+
+python do_check_smw_uri () {
+    # manually check for SMW_URI to better explain why it is missing and where to get it
+    smw_uri = d.getVar("SMW_URI") or ""
+    try:
+        fetcher = bb.fetch2.Fetch([smw_uri], d)
+        fetcher.checkstatus()
+    except bb.fetch2.BBFetchException:
+        bb.fatal(f"{smw_uri} is missing. This is a proprietary NXP package that you can download from here:\n" \
+                  "\thttps://www.nxp.com/webapp/Download?colCode=SE05x-PLUG-TRUST-MW&appType=license")
+}
+addtask do_check_smw_uri before do_fetch
 
 do_configure() {
     cmake_do_configure
