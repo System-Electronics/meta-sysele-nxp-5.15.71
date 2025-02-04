@@ -131,6 +131,102 @@ TARGET_FPU           = ""
 ```
 ---------------------------
 
+
+##  Build secure boot image
+
+Download the Code Signing Tools by NXP from [this link](https://www.nxp.com/webapp/Download?colCode=IMX_CST_TOOL_NEW&appType=license) and extract it to some location.
+
+Add the location of the extracted package to local.conf as:
+
+```
+CST_PATH = /path/to/extracted/cst-4.0.0
+```
+
+---
+The following steps are required if you want to generate your own set of keys, otherwise the build will use the default ones (not recommend for production).
+
+```bash
+$ cd /path/to/extracted/cst-4.0.0/keys
+```
+
+Create a text file called "serial", which contains 8 digits. It will be used for the certificate serial numbers.
+
+```bash
+echo 12345678 > serial
+```
+
+Create a text file called "key_pass.txt", which contains two lines of a password repeated twice.
+This password will be used to protect the generated private keys.
+All private keys in the PKI tree are in PKCS #8 format will be protected by the same password.
+
+```bash
+echo mypassword >  key_pass.txt
+echo mypassword >> key_pass.txt
+```
+
+Now, to generate the PKI tree, run the following:
+
+```bash
+./hab4_pki_tree.sh
+```
+
+And complete the interactive questions. For example:
+
+```
+Do you want to use an existing CA key (y/n)?: n
+
+Key type options (confirm targeted device supports desired key type):
+Select the key type (possible values: rsa, rsa-pss, ecc)?: rsa
+Enter key length in bits for PKI tree: 4096                                                                                                                                                                                                  Enter PKI tree duration (years): 20
+How many Super Root Keys should be generated? 4
+Do you want the SRK certificates to have the CA flag set? (y/n)?: y
+```
+
+Generate Super Root Key (SRK) table
+```bash
+cd ../crts/
+../linux64/bin/srktool -h 4 -t SRK_1_2_3_4_table.bin -e SRK_1_2_3_4_fuse.bin -d sha256 -c ./SRK1_sha256_4096_65537_v3_ca_crt.pem,./SRK2_sha256_4096_65537_v3_ca_crt.pem,./SRK3_sha256_4096_65537_v3_ca_crt.pem,./SRK4_sha256_4096_65537_v3_ca_crt.pem -f 1
+```
+
+To customize the signing process of `cst_signer` (see [nxp-cst-signer](https://github.com/nxp-imx-support/nxp-cst-signer)), add a `csf_hab4.cfg` file inside `CST_PATH`.
+For example:
+
+```
+#Header
+header_version=4.3
+header_eng=CAAM
+header_eng_config=0
+#Install SRK
+srktable_file=SRK_1_2_3_4_table.bin
+srk_source_index=0
+#Install NOCAK
+nocak_file=
+#Install CSFK
+csfk_file=CSF1_1_sha256_4096_65537_v3_usr_crt.pem
+#Authenticate CSF
+#Unlock
+unlock_engine=CAAM
+unlock_features=MID
+unlock_uid=
+#Install Key
+img_verification_index=0
+img_target_index=2
+img_file=IMG1_1_sha256_4096_65537_v3_usr_crt.pem
+#Authenticate Data
+auth_verification_index=2
+```
+
+Finally, build the final image:
+
+```bash
+bitbake system-astrial-image-secure-boot
+```
+
+For more information about HABv4 and iMX Secure Boot see the following documents:
+- <https://github.com/u-boot/u-boot/blob/master/doc/imx/habv4/introduction_habv4.txt>
+- <https://community.nxp.com/pwmxy87654/attachments/pwmxy87654/imx-processors/202591/1/CST_UG.pdf>
+- <https://www.nxp.com/doc/AN4581>
+
 # Board programming
 
 The artifacts are located in the directory `tmp/deploy/images/astrial-imx8mp`.
@@ -138,10 +234,15 @@ The artifacts are located in the directory `tmp/deploy/images/astrial-imx8mp`.
 The files needed to program the board are the following:
 
 - **imx-boot-astrial-imx8mp-sd.bin-flash_evk**
-- **system-astrial-image-astrial-imx8mp-20240301095121.rootfs.wic.zst**
+- **signed-imx-boot-astrial-imx8mp-sd.bin-flash_evk**
+
+Or, if built with secure boot:
+- **signed-imx-boot-astrial-imx8mp-sd.bin-flash_evk**
+- **system-astrial-image-secure-boot-astrial-imx8mp-20240301095121.rootfs.wic.zst**
+- **SRK_1_2_3_4_fuse.bin.u-boot-cmds**
+    - with reference commands for efuse programming
 
 **NOTE**: replace the timestamp '20240301095121' with the proper one.
-
 
 ## MicroSD programming
 
@@ -204,6 +305,28 @@ sudo ./uuu -b emmc_all imx-boot-astrial-imx8mp-sd.bin-flash_evk system-astrial-i
 ```
 
 At the end, power off the board, disconnect the microUSB cable from USB-OTG and power it on again.
+
+
+## Verify Secure Boot
+
+HAB generates events when processing the commands if it encounters issues.
+The U-Boot `hab_status` command displays any events that were generated.
+Run it at the U-Boot command line:
+
+```
+=> hab_status
+```
+
+If everything is okay you should get the following output:
+
+```
+Secure boot disabled
+
+HAB Configuration: 0xf0, HAB State: 0x66
+No HAB Events Found!
+```
+
+The same output should be displayed when booting the signed kernel image.
 
 
 ---------------------
