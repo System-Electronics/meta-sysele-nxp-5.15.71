@@ -139,7 +139,7 @@ Download the Code Signing Tools by NXP from [this link](https://www.nxp.com/weba
 Add the location of the extracted package to local.conf as:
 
 ```
-CST_PATH = /path/to/extracted/cst-4.0.0
+CST_PATH = "/path/to/extracted/cst-4.0.0"
 ```
 
 ---
@@ -177,7 +177,8 @@ Do you want to use an existing CA key (y/n)?: n
 
 Key type options (confirm targeted device supports desired key type):
 Select the key type (possible values: rsa, rsa-pss, ecc)?: rsa
-Enter key length in bits for PKI tree: 4096                                                                                                                                                                                                  Enter PKI tree duration (years): 20
+Enter key length in bits for PKI tree: 4096
+Enter PKI tree duration (years): 20
 How many Super Root Keys should be generated? 4
 Do you want the SRK certificates to have the CA flag set? (y/n)?: y
 ```
@@ -234,7 +235,7 @@ The artifacts are located in the directory `tmp/deploy/images/astrial-imx8mp`.
 The files needed to program the board are the following:
 
 - **imx-boot-astrial-imx8mp-sd.bin-flash_evk**
-- **signed-imx-boot-astrial-imx8mp-sd.bin-flash_evk**
+- **system-astrial-image-astrial-imx8mp-20240301095121.rootfs.wic.zst**
 
 Or, if built with secure boot:
 - **signed-imx-boot-astrial-imx8mp-sd.bin-flash_evk**
