@@ -29,6 +29,7 @@ SRC_URI = "${SMW_URI} \
            file://0002-fix-core-json-as-static-library.patch;patchdir=.. \
            file://0003-fix-remove-use-of-missing-python-cryptography-api.patch;patchdir=.. \
            file://0004-fix-pycli-setup.py.patch;patchdir=.. \
+           file://0005-feat-install-se05x_MandatePlatformSCP.patch;patchdir=.. \
            "
 
 EXTRA_OECMAKE:append = "\
@@ -38,8 +39,9 @@ EXTRA_OECMAKE:append = "\
     -DPTMW_HostCrypto=OPENSSL \
     -DPTMW_SMCOM=T1oI2C \
     -DPTMW_Applet=SE05X_C \
-    -DPTMW_SE05X_Auth=None \
     -DPTMW_SE05X_Ver=03_XX \
+    -DPTMW_SCP=SCP03_SSS \
+    -DPTMW_SE05X_Auth=PlatfSCP03 \
     -DPAHO_BUILD_DEB_PACKAGE=OFF \
     -DPAHO_BUILD_DOCUMENTATION=OFF \
     -DPAHO_BUILD_SHARED=ON \
