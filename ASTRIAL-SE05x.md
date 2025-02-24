@@ -95,4 +95,176 @@ Key-Id: 0X1010101    No Info available                Size(Bits): 192
 ssscli disconnect
 ```
 
+## Cryptographic Operations
+### ECC (Generate, Sign, Verify)
 
+The following is a simple example with `ssscli` that generates a key pair, signs a file and then verifies it against the same key.
+```bash
+$ ssscli generate ecc 0x100 NIST_P192
+$ ssscli sign 0x100 test_file test_file.sig
+$ ssscli verify 0x100 test_file test_file.sig
+$ ssscli get ecc pair 0x100 ecc-key.pem
+```
+One could also import its own set of keys:
+```bash
+$ ssscli set ecc pair 0x100 ecc-key.pem
+```
+And perform the verification via the custom openssl engine:
+```bash
+$ export EX_SSS_BOOT_SSS_PORT=/dev/i2c-2
+$ openssl dgst -engine /usr/lib/libsss_engine.so -verify ecc-key.pem -signature test_file.sig test_file
+```
+
+To implement this operations in a custom workflow, the `sss` APIs from the se05x middleware can be used as seen in the `ex_sss_ecc` example `simw-top/sss/ex/ecc/ex_sss_ecc.c`.
+These are the key functions used:
+- `sss_key_object_init`
+- `sss_key_object_allocate_handle`
+- `sss_key_store_set_key`
+- `sss_asymmetric_context_init`
+- `sss_asymmetric_sign_digest`
+- `sss_asymmetric_verify_digest`
+
+### RSA (Generate, Encrypt, Decrypt)
+
+The following is a simple example with `ssscli` that generates a key pair, encrypts a file and then decrypts it.
+```bash
+$ ssscli generate rsa 0x200 2048
+$ ssscli get rsa pub 0x200 rsa-key.pub
+$ ssscli get rsa pair 0x200 rsa-key
+$ ssscli encrypt 0x201 "Hello World!" hello_world.enc
+$ ssscli decrypt 0x200 hello_world.enc hello_world.txt
+$ cat hello_world.txt
+    "Hello World!"
+```
+Or likewise, perform encryption and decryption via the custom openssl engine:
+```bash
+$ echo "Hello World!" > test_file
+$ export EX_SSS_BOOT_SSS_PORT=/dev/i2c-2
+$ openssl rsautl -engine /usr/lib/libsss_engine.so -encrypt -inkey rsa-key -out test_file.enc -in test_file
+$ openssl rsautl -engine /usr/lib/libsss_engine.so -decrypt -inkey rsa-key.pub -in test_file.enc -out test_file.dec
+$ echo test_file.dec
+    "Hello World!"
+```
+
+In this example, the key functions used are:
+- `sss_key_object_init`
+- `sss_key_object_allocate_handle`
+- `sss_key_store_set_key`
+- `sss_asymmetric_context_init`
+- `sss_asymmetric_encrypt`
+- `sss_asymmetric_decrypt`
+
+## Secure Communication Channel (PlatformSCP03)
+
+The yocto layer is built by default with `-DPTMW_SE05X_Auth=PlatfSCP03` to allow PlatformSCP connections (though not mandatory).
+Any delivered SE05x device has a SCP03 base key set that contains the same keys for each device-type.
+
+With `ssscli` the SCP connection can be established as follows:
+```bash
+$ ssscli connect se05x t1oi2c /dev/i2c-2 --auth_type=PlatformSCP --scpkey=scp_keys.txt
+$ ssscli se05x uid
+    sss   :INFO :atr (Len=35)
+          01 A0 00 00    03 96 04 03    E8 00 FE 02    0B 03 E8 00
+          01 00 00 00    00 64 13 88    0A 00 65 53    45 30 35 31
+          00 00 00
+    INFO:sss.se05x:04005001029c6f7358447f043c6e9ab61d90
+    Unique ID: 04005001029c6f7358447f043c6e9ab61d90
+```
+Where `scp_keys.txt` is a file in the following format:
+```
+ENC d2db63e7a0a5aed72a6460c4dfdcaf64
+MAC 738d5b798ed241b0b24768514bfba95b
+DEK 6702dac30942b2c85e7f47b42ced4e7f
+```
+These values are the base keys values already present on the chip.
+
+### Key Rotation
+The se05x middleware includes the "SE05X Rotate PlatformSCP" demo which rotates the existing SCP03 keys to new keys and then reverts them back.
+Once the key rotation is successful on the chip, a file is created `/tmp/SE05X/plain_scp.txt`, which contains updated key values written to chip.
+
+```bash
+$ export EX_SSS_BOOT_SSS_PORT=/dev/i2c-2
+$ se05x_RotatePlatformSCP03Keys
+    App   :INFO :PlugAndTrust_v04.05.01_20240219
+    App   :INFO :Running se05x_RotatePlatformSCP03Keys
+    App   :INFO :Using PortName='/dev/i2c-2' (ENV: EX_SSS_BOOT_SSS_PORT=/dev/i2c-2)
+    App   :INFO :Using default PlatfSCP03 keys. You can use keys from file using ENV=EX_SSS_BOOT_SCP03_PATH
+    sss   :INFO :atr (Len=35)
+          01 A0 00 00    03 96 04 03    E8 00 FE 02    0B 03 E8 00
+          01 00 00 00    00 64 13 88    0A 00 65 53    45 30 35 31
+          00 00 00
+    App   :INFO :Using default PlatfSCP03 keys. You can use keys from file using ENV=EX_SSS_BOOT_SCP03_PATH
+    App   :INFO :Updating key with version - 0b
+    App   :INFO :Congratulations !!! Key Rotation Successful!!!!
+    App   :WARN :Cannot access SCP03 keys directory '/tmp/SE05X/'
+    App   :INFO :Creating directory
+    App   :WARN :Changed keys logged to /tmp/SE05X/plain_scp.txt.
+    App   :INFO :Updating key with version - 0b
+    App   :INFO :Congratulations !!! Key Rotation Successful!!!!
+    App   :INFO :SCP03 keys directory exists
+    App   :WARN :Changed keys logged to /tmp/SE05X/plain_scp.txt.
+    App   :INFO :
+
+     NOTE:
+     SE05x uses KVN (Key Version Number) 11 to authenticate the PlatformSCP channel.
+     SE051 has an additional key in KVN 12 injected.
+     To use KVN 12 for PlatformSCP authentication, update 'EX_SSS_AUTH_SE05X_KEY_VERSION_NO' in ex_sss_auth.h file.
+    App   :INFO :
+
+    App   :INFO :se05x_TP_PlatformSCP03keys Example Success !!!...
+    App   :INFO :ex_sss Finished
+```
+
+Operations on how to perform the key rotation can be found in the  `tp_PlatformKeys` function.
+
+### Mandatory SCP
+The "SE05X Mandate SCP" demo can be used as a reference to further secure the chip and disallow any non-SCP connection.
+
+```bash
+$ export EX_SSS_BOOT_SSS_PORT=/dev/i2c-2
+$ se05x_MandatePlatformSCP
+    App   :INFO :PlugAndTrust_v04.05.01_20240219
+    App   :INFO :Running se05x_MandatePlatformSCP
+    App   :INFO :Using PortName='/dev/i2c-2' (ENV: EX_SSS_BOOT_SSS_PORT=/dev/i2c-2)
+    App   :WARN :Using SCP03 keys from:'/tmp/SE05X/plain_scp.txt' (FILE=/tmp/SE05X/plain_scp.txt)
+    sss   :INFO :atr (Len=35)
+          01 A0 00 00    03 96 04 03    E8 00 FE 02    0B 03 E8 00
+          01 00 00 00    00 64 13 88    0A 00 65 53    45 30 35 31
+          00 00 00
+    sss   :INFO :atr (Len=35)
+          01 A0 00 00    03 96 04 03    E8 00 FE 02    0B 03 E8 00
+          01 00 00 00    00 64 13 88    0A 00 65 53    45 30 35 31
+          00 00 00
+    sss   :WARN :Communication channel is with UserID (But Plain).
+    sss   :WARN :!!!Not recommended for production use.!!!
+    App   :INFO :Se05x_API_SetPlatformSCPRequest Successful
+    App   :WARN :Further communication must be encrypted
+    App   :INFO :se05x_MandatePlatformSCP Example Success !!!...
+    App   :INFO :ex_sss Finished
+```
+
+The API function for this purpose is `Se05x_API_SetPlatformSCPRequest` with the `kSE05x_PlatformSCPRequest_REQUIRED` parameter.
+
+To verify that a plain connection cannot be established anymore, run:
+```bash
+$ ssscli connect se05x t1oi2c /dev/i2c-2
+$ ssscli se05x uid
+    sss   :INFO :atr (Len=35)
+          01 A0 00 00    03 96 04 03    E8 00 FE 02    0B 03 E8 00 
+          01 00 00 00    00 64 13 88    0A 00 65 53    45 30 35 31 
+          00 00 00 
+    sss   :WARN :Communication channel is Plain.
+    sss   :WARN :!!!Not recommended for production use.!!!
+    sss   :WARN :nxEnsure:'ret == SM_OK' failed. At Line:7837 Function:sss_se05x_TXn
+    sss   :ERROR:Invalid property
+    INFO:sss.se05x:000000000000000000000000000000000000
+    Unique ID: 000000000000000000000000000000000000
+$ ssscli connect se05x t1oi2c /dev/i2c-2 --auth_type=PlatformSCP --scpkey=/tmp/SE05X/plain_scp.txt
+$ ssscli se05x uid
+    sss   :INFO :atr (Len=35)
+          01 A0 00 00    03 96 04 03    E8 00 FE 02    0B 03 E8 00
+          01 00 00 00    00 64 13 88    0A 00 65 53    45 30 35 31
+          00 00 00
+    INFO:sss.se05x:04005001029c6f7358447f043c6e9ab61d90
+    Unique ID: 04005001029c6f7358447f043c6e9ab61d90
+```
