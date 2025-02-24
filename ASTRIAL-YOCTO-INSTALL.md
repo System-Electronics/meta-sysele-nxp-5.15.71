@@ -400,3 +400,13 @@ Connected Known USB Devices
 
 ## SE05x error during build
 If the full image is built for the first time, the recipe `se05x` will cause an error. To solve it, please see the guide [here](https://github.com/System-Electronics/meta-sysele-nxp-5.15.71/blob/main/ASTRIAL-SE05x.md).
+
+## Enable DSI
+DSI port is disabled by default. For more infomation about how to enable the display port, please see the guide [here](https://github.com/System-Electronics/meta-sysele-nxp-5.15.71/blob/main/ASTRIAL-ENABLE-DSI.md).
+
+## Rootfs resize
+From release version 1.1.2 and above, `rootfs-resize` recipe has been introduced to expand root partition to the maximum size. To prevent possible kernel errors, be sure to run the following commands after the first boot:
+```bash
+sync
+reboot
+```
