@@ -1,7 +1,9 @@
 # Astrial SE05x
 
 ## Reference
-https://www.nxp.com/products/SE050
+- https://www.nxp.com/products/SE050
+- PlugAndTrustMW.pdf (from se05x_mw_v04.05.01.zip)
+- [AN13013 | Get started with EdgeLock SE05x support package](https://www.nxp.com/docs/en/application-note/AN13013.pdf)
 
 ## Build Information
 If you try to build the full image or the single recipe ```se05x``` for the first time, the following messages will be shown and the build will be interrupted:
@@ -159,7 +161,13 @@ In this example, the key functions used are:
 The yocto layer is built by default with `-DPTMW_SE05X_Auth=PlatfSCP03` to allow PlatformSCP connections (though not mandatory).
 Any delivered SE05x device has a SCP03 base key set that contains the same keys for each device-type.
 
-With `ssscli` the SCP connection can be established as follows:
+In the previous examples, any `ssscli` command reported the following warnings since no PlatformSCP connection was established:
+```
+    sss   :WARN :Communication channel is Plain.
+    sss   :WARN :!!!Not recommended for production use.!!!
+```
+
+The secure SCP connection can be established as follows:
 ```bash
 $ ssscli connect se05x t1oi2c /dev/i2c-2 --auth_type=PlatformSCP --scpkey=scp_keys.txt
 $ ssscli se05x uid
@@ -179,6 +187,8 @@ DEK 6702dac30942b2c85e7f47b42ced4e7f
 These values are the base keys values already present on the chip.
 
 ### Key Rotation
+- `simw-top/demos/se05x/se05x_RotatePlatformSCP03Keys/`
+
 The se05x middleware includes the "SE05X Rotate PlatformSCP" demo which rotates the existing SCP03 keys to new keys and then reverts them back.
 Once the key rotation is successful on the chip, a file is created `/tmp/SE05X/plain_scp.txt`, which contains updated key values written to chip.
 
@@ -215,9 +225,11 @@ $ se05x_RotatePlatformSCP03Keys
     App   :INFO :ex_sss Finished
 ```
 
-Operations on how to perform the key rotation can be found in the  `tp_PlatformKeys` function.
+Operations on how to perform the key rotation can be found in the `tp_PlatformKeys` function in the demo source code.
 
 ### Mandatory SCP
+- `simw-top/demos/se05x/se05x_MandatePlatformSCP/`
+
 The "SE05X Mandate SCP" demo can be used as a reference to further secure the chip and disallow any non-SCP connection.
 
 ```bash
