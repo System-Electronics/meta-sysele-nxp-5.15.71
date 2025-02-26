@@ -136,8 +136,8 @@ The following is a simple example with `ssscli` that generates a key pair, encry
 ```bash
 ssscli connect se05x t1oi2c /dev/i2c-2
 ssscli generate rsa 0x200 2048
-ssscli get rsa pub 0x200 rsa-key.pub
-ssscli get rsa pair 0x200 rsa-key
+ssscli get rsa pub 0x200 rsa-pub.pem
+ssscli set rsa pub 0x201 rsa-pub.pem
 ssscli encrypt 0x201 "Hello World!" hello_world.enc
 ssscli decrypt 0x200 hello_world.enc hello_world.txt
 cat hello_world.txt
@@ -148,8 +148,10 @@ Or likewise, perform encryption and decryption via the custom openssl engine:
 ```bash
 echo "Hello World!" > test_file
 export EX_SSS_BOOT_SSS_PORT=/dev/i2c-2
-openssl rsautl -engine /usr/lib/libsss_engine.so -encrypt -inkey rsa-key -out test_file.enc -in test_file
-openssl rsautl -engine /usr/lib/libsss_engine.so -decrypt -inkey rsa-key.pub -in test_file.enc -out test_file.dec
+openssl genrsa -out rsa-prv.pem
+openssl rsa -in rsa-prv.pem -pubout -out rsa-pub.pem
+openssl pkeyutl -engine /usr/lib/libsss_engine.so -encrypt -pubin -inkey rsa-pub.pem -out test_file.enc -in test_file
+openssl pkeyutl -engine /usr/lib/libsss_engine.so -decrypt -inkey rsa-pub.pem -in test_file.enc -out test_file.dec
 echo test_file.dec
     "Hello World!"
 ```
