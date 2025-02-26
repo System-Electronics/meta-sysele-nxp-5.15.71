@@ -102,19 +102,19 @@ ssscli disconnect
 
 The following is a simple example with `ssscli` that generates a key pair, signs a file and then verifies it against the same key.
 ```bash
-$ ssscli generate ecc 0x100 NIST_P192
-$ ssscli sign 0x100 test_file test_file.sig
-$ ssscli verify 0x100 test_file test_file.sig
-$ ssscli get ecc pair 0x100 ecc-key.pem
+ssscli generate ecc 0x100 NIST_P192
+ssscli sign 0x100 test_file test_file.sig
+ssscli verify 0x100 test_file test_file.sig
+ssscli get ecc pair 0x100 ecc-key.pem
 ```
 One could also import its own set of keys:
 ```bash
-$ ssscli set ecc pair 0x100 ecc-key.pem
+ssscli set ecc pair 0x100 ecc-key.pem
 ```
 And perform the verification via the custom openssl engine:
 ```bash
-$ export EX_SSS_BOOT_SSS_PORT=/dev/i2c-2
-$ openssl dgst -engine /usr/lib/libsss_engine.so -verify ecc-key.pem -signature test_file.sig test_file
+export EX_SSS_BOOT_SSS_PORT=/dev/i2c-2
+openssl dgst -engine /usr/lib/libsss_engine.so -verify ecc-key.pem -signature test_file.sig test_file
 ```
 
 To implement this operations in a custom workflow, the `sss` APIs from the se05x middleware can be used as seen in the `ex_sss_ecc` example `simw-top/sss/ex/ecc/ex_sss_ecc.c`.
@@ -130,21 +130,21 @@ These are the key functions used:
 
 The following is a simple example with `ssscli` that generates a key pair, encrypts a file and then decrypts it.
 ```bash
-$ ssscli generate rsa 0x200 2048
-$ ssscli get rsa pub 0x200 rsa-key.pub
-$ ssscli get rsa pair 0x200 rsa-key
-$ ssscli encrypt 0x201 "Hello World!" hello_world.enc
-$ ssscli decrypt 0x200 hello_world.enc hello_world.txt
-$ cat hello_world.txt
+ssscli generate rsa 0x200 2048
+ssscli get rsa pub 0x200 rsa-key.pub
+ssscli get rsa pair 0x200 rsa-key
+ssscli encrypt 0x201 "Hello World!" hello_world.enc
+ssscli decrypt 0x200 hello_world.enc hello_world.txt
+cat hello_world.txt
     "Hello World!"
 ```
 Or likewise, perform encryption and decryption via the custom openssl engine:
 ```bash
-$ echo "Hello World!" > test_file
-$ export EX_SSS_BOOT_SSS_PORT=/dev/i2c-2
-$ openssl rsautl -engine /usr/lib/libsss_engine.so -encrypt -inkey rsa-key -out test_file.enc -in test_file
-$ openssl rsautl -engine /usr/lib/libsss_engine.so -decrypt -inkey rsa-key.pub -in test_file.enc -out test_file.dec
-$ echo test_file.dec
+echo "Hello World!" > test_file
+export EX_SSS_BOOT_SSS_PORT=/dev/i2c-2
+openssl rsautl -engine /usr/lib/libsss_engine.so -encrypt -inkey rsa-key -out test_file.enc -in test_file
+openssl rsautl -engine /usr/lib/libsss_engine.so -decrypt -inkey rsa-key.pub -in test_file.enc -out test_file.dec
+echo test_file.dec
     "Hello World!"
 ```
 
@@ -169,8 +169,8 @@ In the previous examples, any `ssscli` command reported the following warnings s
 
 The secure SCP connection can be established as follows:
 ```bash
-$ ssscli connect se05x t1oi2c /dev/i2c-2 --auth_type=PlatformSCP --scpkey=scp_keys.txt
-$ ssscli se05x uid
+ssscli connect se05x t1oi2c /dev/i2c-2 --auth_type=PlatformSCP --scpkey=scp_keys.txt
+ssscli se05x uid
     sss   :INFO :atr (Len=35)
           01 A0 00 00    03 96 04 03    E8 00 FE 02    0B 03 E8 00
           01 00 00 00    00 64 13 88    0A 00 65 53    45 30 35 31
@@ -193,8 +193,8 @@ The se05x middleware includes the "SE05X Rotate PlatformSCP" demo which rotates 
 Once the key rotation is successful on the chip, a file is created `/tmp/SE05X/plain_scp.txt`, which contains updated key values written to chip.
 
 ```bash
-$ export EX_SSS_BOOT_SSS_PORT=/dev/i2c-2
-$ se05x_RotatePlatformSCP03Keys
+export EX_SSS_BOOT_SSS_PORT=/dev/i2c-2
+se05x_RotatePlatformSCP03Keys
     App   :INFO :PlugAndTrust_v04.05.01_20240219
     App   :INFO :Running se05x_RotatePlatformSCP03Keys
     App   :INFO :Using PortName='/dev/i2c-2' (ENV: EX_SSS_BOOT_SSS_PORT=/dev/i2c-2)
@@ -233,8 +233,8 @@ Operations on how to perform the key rotation can be found in the `tp_PlatformKe
 The "SE05X Mandate SCP" demo can be used as a reference to further secure the chip and disallow any non-SCP connection.
 
 ```bash
-$ export EX_SSS_BOOT_SSS_PORT=/dev/i2c-2
-$ se05x_MandatePlatformSCP
+export EX_SSS_BOOT_SSS_PORT=/dev/i2c-2
+se05x_MandatePlatformSCP
     App   :INFO :PlugAndTrust_v04.05.01_20240219
     App   :INFO :Running se05x_MandatePlatformSCP
     App   :INFO :Using PortName='/dev/i2c-2' (ENV: EX_SSS_BOOT_SSS_PORT=/dev/i2c-2)
@@ -259,8 +259,8 @@ The API function for this purpose is `Se05x_API_SetPlatformSCPRequest` with the 
 
 To verify that a plain connection cannot be established anymore, run:
 ```bash
-$ ssscli connect se05x t1oi2c /dev/i2c-2
-$ ssscli se05x uid
+ssscli connect se05x t1oi2c /dev/i2c-2
+ssscli se05x uid
     sss   :INFO :atr (Len=35)
           01 A0 00 00    03 96 04 03    E8 00 FE 02    0B 03 E8 00 
           01 00 00 00    00 64 13 88    0A 00 65 53    45 30 35 31 
@@ -271,8 +271,8 @@ $ ssscli se05x uid
     sss   :ERROR:Invalid property
     INFO:sss.se05x:000000000000000000000000000000000000
     Unique ID: 000000000000000000000000000000000000
-$ ssscli connect se05x t1oi2c /dev/i2c-2 --auth_type=PlatformSCP --scpkey=/tmp/SE05X/plain_scp.txt
-$ ssscli se05x uid
+ssscli connect se05x t1oi2c /dev/i2c-2 --auth_type=PlatformSCP --scpkey=/tmp/SE05X/plain_scp.txt
+ssscli se05x uid
     sss   :INFO :atr (Len=35)
           01 A0 00 00    03 96 04 03    E8 00 FE 02    0B 03 E8 00
           01 00 00 00    00 64 13 88    0A 00 65 53    45 30 35 31
