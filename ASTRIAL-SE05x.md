@@ -186,7 +186,7 @@ ssscli se05x uid
     INFO:sss.se05x:04005001029c6f7358447f043c6e9ab61d90
     Unique ID: 04005001029c6f7358447f043c6e9ab61d90
 ```
-Where `scp_keys.txt` is a file in the following format:
+Where `scp_keys.txt` is a **pre-existing** file in the following format:
 ```
 ENC d2db63e7a0a5aed72a6460c4dfdcaf64
 MAC 738d5b798ed241b0b24768514bfba95b
@@ -195,6 +195,7 @@ DEK 6702dac30942b2c85e7f47b42ced4e7f
 These values are the base keys values already present on the chip.
 
 ### Key Rotation
+> This demo is automatically built by the se05x layer.
 - `simw-top/demos/se05x/se05x_RotatePlatformSCP03Keys/`
 
 The se05x middleware includes the "SE05X Rotate PlatformSCP" demo which rotates the existing SCP03 keys to new keys and then reverts them back.
@@ -236,6 +237,7 @@ se05x_RotatePlatformSCP03Keys
 Operations on how to perform the key rotation can be found in the `tp_PlatformKeys` function in the demo source code.
 
 ### Mandatory SCP
+> This demo is automatically built by the se05x layer.
 - `simw-top/demos/se05x/se05x_MandatePlatformSCP/`
 
 The "SE05X Mandate SCP" demo can be used as a reference to further secure the chip and disallow any non-SCP connection.
