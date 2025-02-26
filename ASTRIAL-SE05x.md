@@ -104,14 +104,16 @@ The following is a simple example with `ssscli` that generates a key pair, signs
 ```bash
 ssscli connect se05x t1oi2c /dev/i2c-2
 ssscli generate ecc 0x100 NIST_P192
+echo "Hello World!" > test_file
 ssscli sign 0x100 test_file test_file.sig
 ssscli verify 0x100 test_file test_file.sig
-ssscli get ecc pair 0x100 ecc-key.pem
+ssscli get ecc pub 0x100 ecc-pub.pem
 ssscli disconnect
 ```
 One could also import its own set of keys:
 ```bash
-ssscli set ecc pair 0x100 ecc-key.pem
+openssl ecparam -name prime192v1 -genkey -out ecc-pair.pem
+ssscli set ecc pair 0x101 ecc-pair.pem
 ```
 And perform the verification via the custom openssl engine:
 ```bash
