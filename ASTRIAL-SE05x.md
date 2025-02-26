@@ -102,10 +102,12 @@ ssscli disconnect
 
 The following is a simple example with `ssscli` that generates a key pair, signs a file and then verifies it against the same key.
 ```bash
+ssscli connect se05x t1oi2c /dev/i2c-2
 ssscli generate ecc 0x100 NIST_P192
 ssscli sign 0x100 test_file test_file.sig
 ssscli verify 0x100 test_file test_file.sig
 ssscli get ecc pair 0x100 ecc-key.pem
+ssscli disconnect
 ```
 One could also import its own set of keys:
 ```bash
@@ -130,6 +132,7 @@ These are the key functions used:
 
 The following is a simple example with `ssscli` that generates a key pair, encrypts a file and then decrypts it.
 ```bash
+ssscli connect se05x t1oi2c /dev/i2c-2
 ssscli generate rsa 0x200 2048
 ssscli get rsa pub 0x200 rsa-key.pub
 ssscli get rsa pair 0x200 rsa-key
@@ -137,6 +140,7 @@ ssscli encrypt 0x201 "Hello World!" hello_world.enc
 ssscli decrypt 0x200 hello_world.enc hello_world.txt
 cat hello_world.txt
     "Hello World!"
+ssscli disconnect
 ```
 Or likewise, perform encryption and decryption via the custom openssl engine:
 ```bash
