@@ -152,7 +152,7 @@ export EX_SSS_BOOT_SSS_PORT=/dev/i2c-2
 openssl genrsa -out rsa-prv.pem
 openssl rsa -in rsa-prv.pem -pubout -out rsa-pub.pem
 openssl pkeyutl -engine /usr/lib/libsss_engine.so -encrypt -pubin -inkey rsa-pub.pem -out test_file.enc -in test_file
-openssl pkeyutl -engine /usr/lib/libsss_engine.so -decrypt -inkey rsa-pub.pem -in test_file.enc -out test_file.dec
+openssl pkeyutl -engine /usr/lib/libsss_engine.so -decrypt -inkey rsa-prv.pem -in test_file.enc -out test_file.dec
 echo test_file.dec
     "Hello World!"
 ```
