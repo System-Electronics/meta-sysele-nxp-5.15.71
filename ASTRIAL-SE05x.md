@@ -153,7 +153,7 @@ openssl genrsa -out rsa-prv.pem
 openssl rsa -in rsa-prv.pem -pubout -out rsa-pub.pem
 openssl pkeyutl -engine /usr/lib/libsss_engine.so -encrypt -pubin -inkey rsa-pub.pem -out test_file.enc -in test_file
 openssl pkeyutl -engine /usr/lib/libsss_engine.so -decrypt -inkey rsa-prv.pem -in test_file.enc -out test_file.dec
-echo test_file.dec
+cat test_file.dec
     "Hello World!"
 ```
 
@@ -178,7 +178,7 @@ In the previous examples, any `ssscli` command reported the following warnings s
 
 The secure SCP connection can be established as follows:
 ```bash
-ssscli connect se05x t1oi2c /dev/i2c-2 --auth_type=PlatformSCP --scpkey=scp_keys.txt
+ssscli connect se05x t1oi2c /dev/i2c-2 --auth_type=PlatformSCP --scpkey=/root/scp_keys.txt
 ssscli se05x uid
     sss   :INFO :atr (Len=35)
           01 A0 00 00    03 96 04 03    E8 00 FE 02    0B 03 E8 00
@@ -193,7 +193,7 @@ ENC d2db63e7a0a5aed72a6460c4dfdcaf64
 MAC 738d5b798ed241b0b24768514bfba95b
 DEK 6702dac30942b2c85e7f47b42ced4e7f
 ```
-**NOTE**: These values are the default keys already present on any SE05x chip, and each variant has different values, which can be found in [AN12436.pdf (Table 5 and 6)](https://www.nxp.com/docs/en/application-note/AN12436.pdf).
+**NOTE**: These values are the default keys already present on any SE050E2, each other variant has different values, which can be found in [AN12436.pdf (Table 5 and 6)](https://www.nxp.com/docs/en/application-note/AN12436.pdf).
 
 ### Key Rotation
 > This demo is automatically built by the se05x layer.
@@ -209,12 +209,12 @@ se05x_RotatePlatformSCP03Keys
     App   :INFO :PlugAndTrust_v04.05.01_20240219
     App   :INFO :Running se05x_RotatePlatformSCP03Keys
     App   :INFO :Using PortName='/dev/i2c-2' (ENV: EX_SSS_BOOT_SSS_PORT=/dev/i2c-2)
-    App   :INFO :Using default PlatfSCP03 keys. You can use keys from file using ENV=EX_SSS_BOOT_SCP03_PATH
+    App   :WARN :Using SCP03 keys from:'/root/scp_keys.txt' (ENV=EX_SSS_BOOT_SCP03_PATH)
     sss   :INFO :atr (Len=35)
           01 A0 00 00    03 96 04 03    E8 00 FE 02    0B 03 E8 00
           01 00 00 00    00 64 13 88    0A 00 65 53    45 30 35 31
           00 00 00
-    App   :INFO :Using default PlatfSCP03 keys. You can use keys from file using ENV=EX_SSS_BOOT_SCP03_PATH
+    App   :WARN :Using SCP03 keys from:'/root/scp_keys.txt' (ENV=EX_SSS_BOOT_SCP03_PATH)
     App   :INFO :Updating key with version - 0b
     App   :INFO :Congratulations !!! Key Rotation Successful!!!!
     App   :WARN :Cannot access SCP03 keys directory '/tmp/SE05X/'
@@ -251,7 +251,7 @@ se05x_MandatePlatformSCP
     App   :INFO :PlugAndTrust_v04.05.01_20240219
     App   :INFO :Running se05x_MandatePlatformSCP
     App   :INFO :Using PortName='/dev/i2c-2' (ENV: EX_SSS_BOOT_SSS_PORT=/dev/i2c-2)
-    App   :WARN :Using SCP03 keys from:'/tmp/SE05X/plain_scp.txt' (FILE=/tmp/SE05X/plain_scp.txt)
+    App   :WARN :Using SCP03 keys from:'/root/scp_keys.txt' (ENV=EX_SSS_BOOT_SCP03_PATH)
     sss   :INFO :atr (Len=35)
           01 A0 00 00    03 96 04 03    E8 00 FE 02    0B 03 E8 00
           01 00 00 00    00 64 13 88    0A 00 65 53    45 30 35 31
@@ -284,7 +284,11 @@ ssscli se05x uid
     sss   :ERROR:Invalid property
     INFO:sss.se05x:000000000000000000000000000000000000
     Unique ID: 000000000000000000000000000000000000
-ssscli connect se05x t1oi2c /dev/i2c-2 --auth_type=PlatformSCP --scpkey=/tmp/SE05X/plain_scp.txt
+ssscli disconnect
+```
+And check that a PlatformSCP connection can be established successfully:
+```bash
+ssscli connect se05x t1oi2c /dev/i2c-2 --auth_type=PlatformSCP --scpkey=/root/scp_keys.txt
 ssscli se05x uid
     sss   :INFO :atr (Len=35)
           01 A0 00 00    03 96 04 03    E8 00 FE 02    0B 03 E8 00
@@ -292,4 +296,5 @@ ssscli se05x uid
           00 00 00
     INFO:sss.se05x:04005001029c6f7358447f043c6e9ab61d90
     Unique ID: 04005001029c6f7358447f043c6e9ab61d90
+ssscli disconnect
 ```
