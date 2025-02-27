@@ -187,7 +187,7 @@ ssscli se05x uid
     INFO:sss.se05x:04005001029c6f7358447f043c6e9ab61d90
     Unique ID: 04005001029c6f7358447f043c6e9ab61d90
 ```
-Where `scp_keys.txt` is a **pre-existing** file in the following format:
+Where `scp_keys.txt` is custom file **to be created** in the following format:
 ```
 ENC d2db63e7a0a5aed72a6460c4dfdcaf64
 MAC 738d5b798ed241b0b24768514bfba95b
