@@ -118,7 +118,7 @@ ssscli set ecc pair 0x101 ecc-pair.pem
 And perform the verification via the custom openssl engine:
 ```bash
 export EX_SSS_BOOT_SSS_PORT=/dev/i2c-2
-openssl dgst -engine /usr/lib/libsss_engine.so -verify ecc-key.pem -signature test_file.sig test_file
+openssl dgst -engine /usr/lib/libsss_engine.so -verify ecc-pub.pem -signature test_file.sig test_file
 ```
 
 To implement this operations in a custom workflow, the `sss` APIs from the se05x middleware can be used as seen in the `ex_sss_ecc` example `simw-top/sss/ex/ecc/ex_sss_ecc.c`.
