@@ -132,6 +132,8 @@ These are the key functions used:
 - `sss_asymmetric_verify_digest`
 
 ### RSA (Generate, Encrypt, Decrypt)
+> [!WARNING]
+> **NOTE** RSA is supported only on SE050 B, C and F variants.
 
 The following is a simple example with `ssscli` that generates a key pair, encrypts a file and then decrypts it.
 ```bash
@@ -239,6 +241,9 @@ se05x_RotatePlatformSCP03Keys
 Operations on how to perform the key rotation can be found in the `tp_PlatformKeys` function in the demo source code.
 
 ### Mandatory SCP
+> [!CAUTION]
+> After running this demo, the use of SCP keys is mandatory
+
 > This demo is automatically built by the se05x layer.
 - `simw-top/demos/se05x/se05x_MandatePlatformSCP/`
 
