@@ -29,7 +29,7 @@ SRC_URI = "${SMW_URI} \
            file://0002-fix-core-json-as-static-library.patch;patchdir=.. \
            file://0003-fix-remove-use-of-missing-python-cryptography-api.patch;patchdir=.. \
            file://0004-fix-pycli-setup.py.patch;patchdir=.. \
-           file://0005-feat-install-se05x_MandatePlatformSCP.patch;patchdir=.. \
+           file://0005-feat-install-se05x_MandatePlatform_SCP.patch;patchdir=.. \
            "
 
 EXTRA_OECMAKE:append = "\
