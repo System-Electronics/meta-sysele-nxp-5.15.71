@@ -4,6 +4,7 @@
 - https://www.nxp.com/products/SE050
 - PlugAndTrustMW.pdf (from se05x_mw_v04.05.01.zip)
 - [AN13013 | Get started with EdgeLock SE05x support package](https://www.nxp.com/docs/en/application-note/AN13013.pdf)
+- [AN12436 | SE050 configurations](https://www.nxp.com/docs/en/application-note/AN12436.pdf)
 
 ## Build Information
 If you try to build the full image or the single recipe ```se05x``` for the first time, the following messages will be shown and the build will be interrupted:
@@ -192,7 +193,7 @@ ENC d2db63e7a0a5aed72a6460c4dfdcaf64
 MAC 738d5b798ed241b0b24768514bfba95b
 DEK 6702dac30942b2c85e7f47b42ced4e7f
 ```
-These values are the base keys values already present on the chip.
+**NOTE**: These values are the default keys already present on any SE05x chip, and each variant has different values, which can be found in [AN12436.pdf (Table 5 and 6)](https://www.nxp.com/docs/en/application-note/AN12436.pdf).
 
 ### Key Rotation
 > This demo is automatically built by the se05x layer.
@@ -203,6 +204,7 @@ Once the key rotation is successful on the chip, a file is created `/tmp/SE05X/p
 
 ```bash
 export EX_SSS_BOOT_SSS_PORT=/dev/i2c-2
+export EX_SSS_BOOT_SCP03_PATH=/root/scp_keys.txt
 se05x_RotatePlatformSCP03Keys
     App   :INFO :PlugAndTrust_v04.05.01_20240219
     App   :INFO :Running se05x_RotatePlatformSCP03Keys
@@ -244,6 +246,7 @@ The "SE05X Mandate SCP" demo can be used as a reference to further secure the ch
 
 ```bash
 export EX_SSS_BOOT_SSS_PORT=/dev/i2c-2
+export EX_SSS_BOOT_SCP03_PATH=/root/scp_keys.txt
 se05x_MandatePlatformSCP
     App   :INFO :PlugAndTrust_v04.05.01_20240219
     App   :INFO :Running se05x_MandatePlatformSCP
