@@ -62,11 +62,24 @@ sss   :WARN :!!!Not recommended for production use.!!!
 INFO:sss.se05x:04005001029c6f7358447f043c6e9ab61d90
 Unique ID: 04005001029c6f7358447f043c6e9ab61d90
 ```
-The UID is unique, in case of different models with more updated Applets there may be the output:
+The UID is unique, in case of older models (e.g. SE050C), these commands will fail with:
 ```bash
-sss   :INFO :Newer version of Applet Found
-sss   :INFO :Compiled for 0x30100. Got newer 0x70200
+sss   :ERROR:Mismatch Applet version.
+sss   :ERROR:Compiled for 0x70200. Got older 0x30101
+sss   :ERROR:Aborting!!!
 ```
+In this case, you need to change the se05x recipe, by replacing:
+```
+-DPTMW_Applet=SE050_E
+-DPTMW_SE05X_Ver=07_02
+```
+with:
+```
+-DPTMW_Applet=SE05X_C
+-DPTMW_SE05X_Ver=03_XX
+```
+or an equivalent flag configuration depending on your variant.
+
 
 4. Check the outputs of the following commands:
 ---
