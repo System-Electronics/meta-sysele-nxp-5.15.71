@@ -20,7 +20,7 @@ To solve the problem:
 2. Save the zip file in ```your/path/sources-extra/meta-sysele-nxp-5.15.71/recipes-security/se05x/files```
 3. Restart the build process
 
-## Example -How to use
+## How to use ssscli Command
 1. Check the presence of the chip via i2c:
 ```bash
 i2cdetect -y 2 0x48 0x48
