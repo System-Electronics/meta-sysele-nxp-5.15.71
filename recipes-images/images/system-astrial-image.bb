@@ -44,4 +44,4 @@ IMAGE_INSTALL:append = " opencv opencv-dev libopencv-core-dev libopencv-highgui-
 
 #################################################################################################################
 ## Tools Extra
-IMAGE_INSTALL:append = " git joe du-dust python3-shtab python3-tldr custom-shell dtc keyctl-caam se05x"
+IMAGE_INSTALL:append = " git joe du-dust python3-shtab python3-tldr custom-shell dtc keyctl-caam se05x python3-pyqt6"
