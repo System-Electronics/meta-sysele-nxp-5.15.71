@@ -1,0 +1,21 @@
+From b57b06ac69f1712e8df3e047221f5640394b2e6f Mon Sep 17 00:00:00 2001
+From: robertoviola-systemelectronics <roberto.viola@systemelectronics.com>
+Date: Mon, 9 Dec 2024 12:22:29 +0100
+Subject: [PATCH] fixing dead link for common submodule
+
+---
+ .gitmodules | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/.gitmodules b/.gitmodules
+index a6b1eda..80ffbc5 100644
+--- a/.gitmodules
++++ b/.gitmodules
+@@ -1,3 +1,3 @@
+ [submodule "common"]
+ 	path = common
+-	url = git://anongit.freedesktop.org/gstreamer/common
++	url = https://github.com/GStreamer/common
+-- 
+2.48.1
+
