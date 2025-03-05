@@ -5,7 +5,7 @@
   <remote fetch="https://github.com/System-Electronics" name="system"/>
 
   <project name="meta-intel-realsense" remote="system" revision="kirkstone" path="sources-extra/meta-intel-realsense"/>
-  <project name="meta-hailo" remote="hailo" revision="d5002048611ecdba71147d057d63481e78bba29e" path="sources-extra/meta-hailo"/>
+  <project name="meta-hailo" remote="hailo" revision="3a2665df39d1464e1808b5c95a8ce44994fae8b5" path="sources-extra/meta-hailo"/>
   <project name="meta-imx8mp-isp-imx219" remote="system" revision="LF5.15.71_P20" path="sources-extra/meta-imx8mp-isp-imx219"/>
   <project name="meta-nxp-security-reference-design" remote="system" path="sources-extra/meta-nxp-security-reference-design" revision="kirkstone-5.15.71-2.2.0"/>
   <project name="meta-sysele-nxp-5.15.71" remote="system" revision="main" path="sources-extra/meta-sysele-nxp-5.15.71" >
