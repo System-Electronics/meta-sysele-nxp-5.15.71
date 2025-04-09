@@ -43,5 +43,9 @@ IMAGE_INSTALL:append = " libgsthailo-dev libhailort-dev libgsthailotools-dev "
 IMAGE_INSTALL:append = " opencv opencv-dev libopencv-core-dev libopencv-highgui-dev libopencv-imgproc-dev libopencv-objdetect-dev libopencv-ml-dev libopencv-ts-dev"
 
 #################################################################################################################
+## Cryptochip
+IMAGE_INSTALL:append = " keyctl-caam se05x"
+
+#################################################################################################################
 ## Tools Extra
-IMAGE_INSTALL:append = " git joe du-dust python3-shtab python3-tldr custom-shell dtc keyctl-caam se05x python3-pyqt6"
+IMAGE_INSTALL:append = " git joe du-dust python3-shtab python3-tldr custom-shell dtc python3-pyqt6"
