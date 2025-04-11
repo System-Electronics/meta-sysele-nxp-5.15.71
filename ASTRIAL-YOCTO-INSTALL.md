@@ -114,7 +114,7 @@ source setup-environment build
 ```bash
 bitbake system-astrial-image
 ```
-**Note:** if the image is built for the first time, please see also [SE05x error during build](#se05x-error-during-build)
+**Note:** If you are interested to use cryptochip SE050, please see also the following [guide](https://github.com/System-Electronics/meta-sysele-nxp-5.15.71/blob/main/ASTRIAL-SE05x.md).
 
 You will see a message screen like this
 
@@ -397,9 +397,6 @@ Connected Known USB Devices
 	==================================================
 	3:6	 MX865	 SDPS:	 0x1FC9	0x0146	 0x0002
 ```
-
-## SE05x error during build
-If the full image is built for the first time, the recipe `se05x` will cause an error. To solve it, please see the guide [here](https://github.com/System-Electronics/meta-sysele-nxp-5.15.71/blob/main/ASTRIAL-SE05x.md).
 
 ## Enable DSI
 DSI port is disabled by default. For more infomation about how to enable the display port, please see the guide [here](https://github.com/System-Electronics/meta-sysele-nxp-5.15.71/blob/main/ASTRIAL-ENABLE-DSI.md).

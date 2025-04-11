@@ -43,8 +43,8 @@ IMAGE_INSTALL:append = " libgsthailo-dev libhailort-dev libgsthailotools-dev "
 IMAGE_INSTALL:append = " opencv opencv-dev libopencv-core-dev libopencv-highgui-dev libopencv-imgproc-dev libopencv-objdetect-dev libopencv-ml-dev libopencv-ts-dev"
 
 #################################################################################################################
-## Cryptochip
-IMAGE_INSTALL:append = " keyctl-caam se05x"
+## Cryptochip: uncomment to enable it
+#IMAGE_INSTALL:append = " keyctl-caam se05x"
 
 #################################################################################################################
 ## Tools Extra

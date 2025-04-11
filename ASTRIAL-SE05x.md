@@ -7,6 +7,13 @@
 - [AN12436 | SE050 configurations](https://www.nxp.com/docs/en/application-note/AN12436.pdf)
 
 ## Build Information
+As first step, you need to enable the `se05x` recipe:
+1. Go to `your/path/sources-extra/meta-sysele-nxp-5.15.71/recipes-images/images`
+2. Open `system-astrial-image.bb` with a text editor
+3. Uncomment the following line:
+```bash
+#IMAGE_INSTALL:append = " keyctl-caam se05x"
+```
 If you try to build the full image or the single recipe ```se05x``` for the first time, the following messages will be shown and the build will be interrupted:
 ```bash
 WARNING: your/path/sources-extra/meta-sysele-nxp-5.15.71/recipes-security/se05x/se05x_04.05.01.bb: Unable to get checksum for se05x SRC_URI entry se05x_mw_v04.05.01.zip: file could not be found
