@@ -2,7 +2,7 @@ DESCRIPTION = "NXP Plug and Trust Middleware"
 LICENSE = "CLOSED & MIT"
 LIC_FILES_CHKSUM = "file://${COMMON_LICENSE_DIR}/MIT;md5=0835ade698e0bcf8506ecda2f7b4f302"
 
-NXP_PLUG_TRUST_MW = "${PN}_mw_v${PV}"
+NXP_PLUG_TRUST_MW = "SE-PLUG-TRUST-MW_${PV}"
 
 FILESEXTRAPATHS:prepend := "${THISDIR}/files:"
 
@@ -20,14 +20,13 @@ RDEPENDS:${PN} += "\
 # Allow symlink .so in non-dev package
 INSANE_SKIP:${PN} += "dev-so"
 
-S = "${WORKDIR}/${NXP_PLUG_TRUST_MW}/simw-top"
-B = "${WORKDIR}/${NXP_PLUG_TRUST_MW}/build"
+S = "${WORKDIR}/simw-top"
+B = "${WORKDIR}/build"
 
 SMW_URI = "file://${NXP_PLUG_TRUST_MW}.zip"
 SRC_URI = "${SMW_URI} \
            file://0001-fix-openssl-3-compatibility.patch;patchdir=.. \
            file://0002-fix-core-json-as-static-library.patch;patchdir=.. \
-           file://0003-fix-remove-use-of-missing-python-cryptography-api.patch;patchdir=.. \
            file://0004-fix-pycli-setup.py.patch;patchdir=.. \
            file://0005-feat-install-se05x_MandatePlatform_SCP.patch;patchdir=.. \
            "

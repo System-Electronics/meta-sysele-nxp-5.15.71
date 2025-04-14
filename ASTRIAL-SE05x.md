@@ -16,10 +16,10 @@ As first step, you need to enable the `se05x` recipe:
 ```
 If you try to build the full image or the single recipe ```se05x``` for the first time, the following messages will be shown and the build will be interrupted:
 ```bash
-WARNING: your/path/sources-extra/meta-sysele-nxp-5.15.71/recipes-security/se05x/se05x_04.05.01.bb: Unable to get checksum for se05x SRC_URI entry se05x_mw_v04.05.01.zip: file could not be found
+WARNING: your/path/sources-extra/meta-sysele-nxp-5.15.71/recipes-security/se05x/se05x_04.05.01.bb: Unable to get checksum for se05x SRC_URI entry SE-PLUG-TRUST-MW_04.07.00.zip: file could not be found
 ```
 ```bash
-ERROR: se05x-04.05.01-r0 do_check_smw_uri: file://se05x_mw_v04.05.01.zip is missing. This is a proprietary NXP package that you can download from here:
+ERROR: se05x-04.05.01-r0 do_check_smw_uri: file://SE-PLUG-TRUST-MW_04.07.00.zip is missing. This is a proprietary NXP package that you can download from here:
 	https://www.nxp.com/webapp/Download?colCode=SE05x-PLUG-TRUST-MW&appType=license
 ```
 To solve the problem:
@@ -50,7 +50,7 @@ ssscli --version
 ```
 output:
 ```bash
-ssscli, version v04.05.01
+ssscli, version v04.07.00
 ```
 
 3. Establish and check the connection with the chip:
@@ -139,7 +139,7 @@ ssscli set ecc pair 0x101 ecc-pair.pem
 And perform the verification via the custom openssl engine:
 ```bash
 export EX_SSS_BOOT_SSS_PORT=/dev/i2c-2
-openssl dgst -engine /usr/lib/libsss_engine.so -verify ecc-pub.pem -signature test_file.sig test_file
+openssl dgst --provider default --provider /usr/lib/libsssProvider.so -verify ecc-pub.pem -signature test_file.sig test_file
 ```
 
 To implement this operations in a custom workflow, the `sss` APIs from the se05x middleware can be used as seen in the `ex_sss_ecc` example `simw-top/sss/ex/ecc/ex_sss_ecc.c`.
