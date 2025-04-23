@@ -44,7 +44,7 @@ IMAGE_INSTALL:append = " opencv opencv-dev libopencv-core-dev libopencv-highgui-
 
 #################################################################################################################
 ## Cryptochip: uncomment to enable it
-IMAGE_INSTALL:append = " keyctl-caam se05x"
+#IMAGE_INSTALL:append = " keyctl-caam se05x"
 
 #################################################################################################################
 ## Tools Extra
