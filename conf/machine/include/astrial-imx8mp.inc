@@ -37,4 +37,4 @@ IMX_DEFAULT_BSP = "nxp"
 # we need to change the default serial for TF-A
 ATF_BOOT_UART_BASE = "0x30860000"
 
-WKS_FILE = "${MACHINE}-bootpart.wks.in"
+WKS_FILE = "astrial-imx8mp-bootpart.wks.in"
