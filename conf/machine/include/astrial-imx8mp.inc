@@ -1,9 +1,3 @@
-#@TYPE: Machine
-#@NAME: System Electronics Astrial i.MX 8M Plus with LPDDR4
-#@SOC: i.MX8MP
-#@DESCRIPTION: Machine configuration for System Electronics Astrial i.MX 8M Plus board with LPDDR4
-#@MAINTAINER: Koan software <info@koansoftware.com>
-
 require conf/machine/include/imx8mp-evk.inc
 
 # kernel device tree
@@ -42,3 +36,5 @@ IMX_DEFAULT_BSP = "nxp"
 
 # we need to change the default serial for TF-A
 ATF_BOOT_UART_BASE = "0x30860000"
+
+WKS_FILE = "astrial-imx8mp-bootpart.wks.in"
