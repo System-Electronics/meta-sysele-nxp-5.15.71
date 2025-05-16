@@ -43,5 +43,18 @@ IMAGE_INSTALL:append = " libgsthailo-dev libhailort-dev libgsthailotools-dev "
 IMAGE_INSTALL:append = " opencv opencv-dev libopencv-core-dev libopencv-highgui-dev libopencv-imgproc-dev libopencv-objdetect-dev libopencv-ml-dev libopencv-ts-dev"
 
 #################################################################################################################
+## Cryptochip: uncomment to enable it
+#IMAGE_INSTALL:append = " keyctl-caam se05x"
+
+#################################################################################################################
 ## Tools Extra
-IMAGE_INSTALL:append = " git joe du-dust python3-shtab python3-tldr custom-shell dtc keyctl-caam se05x python3-pyqt6"
+IMAGE_INSTALL:append = " git joe du-dust python3-shtab python3-tldr custom-shell dtc python3-pyqt6"
+
+# Rootfs will automatically resize to fill entire space by itself, but leave some extra space for initial operations
+# Use overhead factor instead of extra space since there are some problems with the rootfs size estimation which lead to:
+#   Copying files into the device: __populate_fs: Could not allocate block in ext2 filesystem while writing file "..."
+IMAGE_OVERHEAD_FACTOR = "1.06"
+IMAGE_ROOTFS_EXTRA_SPACE = "0"
+# compute maximum rootfs size in order to fit in 8GB eMMC
+# this is just a guess using the size reported by fdisk minus the overhead from the boot partitions (72MiB)
+IMAGE_ROOTFS_MAXSIZE = "${@ 7566524416 - (72 * 1024 * 1024) }"

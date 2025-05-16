@@ -114,7 +114,6 @@ source setup-environment build
 ```bash
 bitbake system-astrial-image
 ```
-**Note:** if the image is built for the first time, please see also [SE05x error during build](#se05x-error-during-build)
 
 You will see a message screen like this
 
@@ -124,14 +123,29 @@ BB_VERSION           = "2.0.0"
 BUILD_SYS            = "x86_64-linux"
 NATIVELSBSTRING      = "ubuntu-22.04"
 TARGET_SYS           = "aarch64-poky-linux"
-MACHINE              = "astrial-imx8mp"
+MACHINE              = "astrial-8gb-imx8mp"
 DISTRO               = "fsl-imx-xwayland"
 DISTRO_VERSION       = "5.15-kirkstone"
 TUNE_FEATURES        = "aarch64 armv8a crc crypto"
 TARGET_FPU           = ""
 ```
----------------------------
 
+**Note:** This process will build a full rootfs image compatible with the 8GB RAM Astrial model. For the other configurations you have to change the `MACHINE`. Here an example to explain how to switch to another `MACHINE`:
+
+```bash
+export MACHINE=astrial-4gb-imx8mp
+bitbake system-astrial-image
+```
+
+The `MACHINE` available are:
+
+```bash
+MACHINE=astrial-8gb-imx8mp (default)
+MACHINE=astrial-4gb-imx8mp
+MACHINE=astrial-2gb-imx8mp
+```
+
+---------------------------
 
 ##  Build secure boot image
 
@@ -370,7 +384,6 @@ BB_NUMBER_THREADS="4"
 
 The build may fail many times. In that case check that your PC meets the minimum requirements and restart bitbake again.
 
-
 ## Errors during package build
 
 It is possible to overcome errors on specific package build, restarting its build from scratch and restart the normal `bitbake system-astrial-image`.
@@ -398,9 +411,6 @@ Connected Known USB Devices
 	3:6	 MX865	 SDPS:	 0x1FC9	0x0146	 0x0002
 ```
 
-## SE05x error during build
-If the full image is built for the first time, the recipe `se05x` will cause an error. To solve it, please see the guide [here](https://github.com/System-Electronics/meta-sysele-nxp-5.15.71/blob/main/ASTRIAL-SE05x.md).
-
 ## Enable DSI
 DSI port is disabled by default. For more infomation about how to enable the display port, please see the guide [here](https://github.com/System-Electronics/meta-sysele-nxp-5.15.71/blob/main/ASTRIAL-ENABLE-DSI.md).
 
@@ -410,3 +420,6 @@ From release version 1.1.2 and above, `rootfs-resize` recipe has been introduced
 sync
 reboot
 ```
+
+## Enable cryptochip
+If you are interested to use cryptochip SE050, please see the following [guide](https://github.com/System-Electronics/meta-sysele-nxp-5.15.71/blob/main/ASTRIAL-SE05x.md).

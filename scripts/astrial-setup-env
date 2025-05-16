@@ -1,6 +1,6 @@
 #!/bin/bash -e
 
-MACHINE=${MACHINE:-astrial-imx8mp}
+MACHINE=${MACHINE:-astrial-8gb-imx8mp}
 DISTRO=${DISTRO:-fsl-imx-xwayland}
 EULA=1
 T="../sources-extra/meta-sysele-nxp-5.15.71/templates"
