@@ -13,6 +13,10 @@ IMAGE_INSTALL:append = " packagegroup-imx-ml "
 TOOLCHAIN_TARGET_TASK:append = " tensorflow-lite-dev onnxruntime-dev "
 
 #################################################################################################################
+## Uboot environment manipulation
+IMAGE_INSTALL:append = " libubootenv libubootenv-bin u-boot-tools"
+
+#################################################################################################################
 ## Hailo
 IMAGE_INSTALL:append = " libhailort hailortcli pyhailort libgsthailo hailo-pci hailo-firmware"
 IMAGE_INSTALL:append = " libgsthailotools hailo-post-processes"
