@@ -16,3 +16,7 @@ IMAGE_BUILDINFO_VARS:append = " DATETIME DISTRO_NAME IMAGE_BASENAME MACHINE TUNE
 IMAGE_BUILDINFO_VARS:append = " MACHINE_FEATURES DISTRO_FEATURES COMMON_FEATURES IMAGE_FEATURES"
 IMAGE_BUILDINFO_VARS:append = " TUNE_FEATURES TARGET_FPU"
 ##########################################################
+#
+# Workaround: crates.io fetch fails with wget's default UA;
+FETCHCMD_wget = "/usr/bin/env wget -t 2 -T 30 --passive-ftp --user-agent='bitbake/2.0'"
+#
